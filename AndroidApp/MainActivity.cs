@@ -5,6 +5,7 @@
 	using System.Reflection;
 	using Android.App;
 	using Android.OS;
+	using Android.Support.V7.App;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core;
@@ -18,8 +19,8 @@
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
 
-	[Activity(Label = "My Magic App", MainLauncher = true, Icon = "@drawable/icon")]
-	public class MainActivity : Activity, View.IOnClickListener
+	[Activity(Label = "My Magic App", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
+	public class MainActivity : AppCompatActivity, View.IOnClickListener
 	{
 		public List<View> AppLayouts = new List<View>();
 		private readonly Container Container = new Container();
@@ -71,7 +72,6 @@
 		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
-
 			// Set our view from the "main" layout resource
 			this.SetContentView(Resource.Layout.Main);
 			this.AppLayouts.Add(this.FindViewById(Resource.Id.mainLayout));

@@ -4,6 +4,7 @@
     <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
     <SelectedDevice>Device2</SelectedDevice>
     <DefaultDevice>Device2</DefaultDevice>
-    <AndroidDesignerPreferredTheme>Theme.Light</AndroidDesignerPreferredTheme>
+    <AndroidDesignerPreferredTheme>Theme.DeviceDefault</AndroidDesignerPreferredTheme>
+    <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
 </Project>

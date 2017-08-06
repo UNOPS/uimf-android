@@ -11,9 +11,9 @@
 	{
 		private TextView OutputText { get; set; }
 
-		public View GetView(Activity activity, string name, object value, FormActivity formActivity)
+		public View GetView(string name, object value, FormActivity formActivity)
 		{
-			this.OutputText = new TextView(activity);
+			this.OutputText = new TextView(Application.Context);
 			if (value != null)
 			{
 				this.OutputText.Text = name + ": " + value;

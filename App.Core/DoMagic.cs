@@ -8,6 +8,8 @@ using UiMetadataFramework.MediatR;
 
 namespace App.Core
 {
+	using UiMetadataFramework.Basic.Input;
+
 	[Form(Label = "Do some magic", PostOnLoad = false)]
 	public class DoMagic : IForm<DoMagic.Request, DoMagic.Response>
 	{
@@ -19,6 +21,7 @@ namespace App.Core
 				Weight = message.Weight,
 				DateOfBirth = message.DateOfBirth,
 				Height = message.Height,
+				FavouriteDayOfWeek = message.FavouriteDayOfWeek?.Value.ToString(),
 				OtherPeople = new List<Person>
 				{
 					new Person
@@ -76,6 +79,9 @@ namespace App.Core
 
 			[OutputField(OrderIndex = 20)]
 			public FormLink btn { get; set; }
+
+			[OutputField(OrderIndex = 5)]
+			public string FavouriteDayOfWeek { get; set; }
 		}
 
 		public class Person
@@ -106,6 +112,9 @@ namespace App.Core
 
 			[InputField]
 			public decimal Weight { get; set; }
+
+			[InputField]
+			public DropdownValue<DayOfWeek?> FavouriteDayOfWeek { get; set; }
 		}
 	}
 }

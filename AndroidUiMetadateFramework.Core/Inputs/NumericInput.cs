@@ -13,10 +13,9 @@
 	{
 		private EditText InputText { get; set; }
 
-		public View GetView(Activity activity)
+		public View GetView( object inputCustomProperties)
 		{
-			this.InputText = new EditText(activity);
-			this.InputText.InputType = InputTypes.ClassNumber;
+			this.InputText = new EditText(Application.Context) { InputType = InputTypes.ClassNumber };
 			return this.InputText;
 		}
 

@@ -12,10 +12,9 @@
 	{
 		private EditText InputText { get; set; }
 
-		public View GetView(Activity activity)
+		public View GetView(object inputCustomProperties)
 		{
-			this.InputText = new EditText(activity);
-			this.InputText.InputType = InputTypes.ClassText;
+			this.InputText = new EditText(Application.Context) { InputType = InputTypes.ClassText };
 			return this.InputText;
 		}
 

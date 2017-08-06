@@ -12,11 +12,13 @@
 	{
 		private DatePicker dateInput { get; set; }
 
-		public View GetView(Activity activity)
+		public View GetView( object inputCustomProperties)
 		{
-			this.dateInput = new DatePicker(activity);
-			this.dateInput.ScaleX = 0.5f;
-			this.dateInput.ScaleY = 0.5f;
+			this.dateInput = new DatePicker(Application.Context)
+			{
+				ScaleX = 0.5f,
+				ScaleY = 0.5f
+			};
 			return this.dateInput;
 		}
 

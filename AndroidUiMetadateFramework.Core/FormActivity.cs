@@ -5,13 +5,15 @@
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Android.App;
+	using Android.Content.Res;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using MediatR;
-	using Newtonsoft.Json.Linq;
+	using Newtonsoft.Json;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.MediatR;
+	using Orientation = Android.Widget.Orientation;
 
 	public class FormActivity
 	{
@@ -52,20 +54,17 @@
 			{
 				if (!input.Hidden)
 				{
-					var label = new TextView(this.Activity) { Text = input.Label };
+					var label = new TextView(Application.Context) { Text = input.Label };
 					layout.AddView(label, param);
 				}
 
 				var manager = this.InputManagerCollection.GetManager(input.Type);
 
-				var view = manager.GetView(this.Activity);
-				if (this.InputFieldValues != null)
+				var view = manager.GetView(input.CustomProperties);
+				var value = this.InputFieldValues?.SingleOrDefault(a => a.Key.Equals(input.Id)).Value;
+				if (value != null)
 				{
-					var value = this.InputFieldValues.SingleOrDefault(a => a.Key.Equals(input.Id)).Value;
-					if (value != null)
-					{
-						manager.SetValue(value);
-					}
+					manager.SetValue(value);
 				}
 				this.InputsManager.Add(new FormInputManager(input, manager, view));
 				if (input.DefaultValue != null)
@@ -84,14 +83,34 @@
 		{
 			this.FormMetadata = this.FormRegister.GetFormInfo(form.FullName)?.Metadata;
 			this.InputFieldValues = inputFieldValues;
-			return await this.StartIForm();
+			var layout = await this.StartIForm();
+			this.Activity.SetContentView(layout);
+			if (layout != null)
+			{
+				this.AppLayouts.Add(layout);
+			}
+			return layout;
+		}
+
+		public async Task<View> GetIForm(string form, IDictionary<string, object> inputFieldValues = null)
+		{
+			this.FormMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
+			this.InputFieldValues = inputFieldValues;
+			var layout = await this.StartIForm();
+			return layout;
 		}
 
 		public async Task<View> StartIForm(string form, IDictionary<string, object> inputFieldValues = null)
 		{
 			this.FormMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
 			this.InputFieldValues = inputFieldValues;
-			return await this.StartIForm();
+			var layout = await this.StartIForm();
+			this.Activity.SetContentView(layout);
+			if (layout != null)
+			{
+				this.AppLayouts.Add(layout);
+			}
+			return layout;
 		}
 
 		public async Task<View> StartIForm()
@@ -99,29 +118,24 @@
 			try
 			{
 				var layout = await this.DrawIFormAsync();
-				if (layout != null)
-				{
-					this.Activity.SetContentView(layout);
-					this.AppLayouts.Add(layout);
-				}
 				return layout;
 			}
 			catch (Exception ex)
 			{
-				Toast.MakeText(this.Activity, ex.Message, ToastLength.Long).Show();
+				Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
 				return null;
 			}
 		}
 
 		private async Task<View> DrawIFormAsync()
 		{
-			var scroll = new ScrollView(this.Activity);
-			var linearLayout = new LinearLayout(this.Activity) { Orientation = Orientation.Vertical };
+			var scroll = new ScrollView(Application.Context);
+			var linearLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
 			linearLayout.SetPadding(20, 10, 20, 10);
 			var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent,
 				ViewGroup.LayoutParams.WrapContent);
 
-			this.ProgressBar = new ProgressBar(this.Activity);
+			this.ProgressBar = new ProgressBar(Application.Context);
 			var progressParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent,
 				ViewGroup.LayoutParams.WrapContent) { Gravity = GravityFlags.Center };
 			this.ProgressBar.LayoutParameters = progressParam;
@@ -130,14 +144,14 @@
 			if (this.FormMetadata != null)
 			{
 				InvokeForm.Response result = null;
-				var resultLayout = new LinearLayout(this.Activity) { Orientation = Orientation.Vertical };
+				var resultLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
 				resultLayout.SetPadding(20, 10, 20, 10);
 				if (this.FormMetadata.InputFields.Count > 0)
 				{
 					this.DrawInputs(linearLayout);
 					if (this.FormMetadata.InputFields.Count(a => !a.Hidden) > 0)
 					{
-						var btn = new Button(this.Activity) { Text = "Submit" };
+						var btn = new Button(Application.Context) { Text = "Submit" };
 						linearLayout.AddView(btn, param);
 						btn.Click += async (sender, args) =>
 						{
@@ -194,7 +208,7 @@
 						{
 							var value = propertyInfo.GetValue(result.Data, null);
 							var manager = this.OutputManagerCollection.GetManager(output.Type);
-							var view = manager.GetView(this.Activity, output.Label, value, this);
+							var view = manager.GetView( output.Label, value, this);
 							view.SetPadding(0, 10, 0, 10);
 							layout.AddView(view, param);
 						}
@@ -205,17 +219,18 @@
 
 		private object GetFormValues()
 		{
-			var jsonObject = new JObject();
-
+			var list = new Dictionary<string, object>();
 			foreach (var inputManager in this.InputsManager)
 			{
 				var value = inputManager.Manager.GetValue();
 				if (value != null)
 				{
-					jsonObject.Add(inputManager.Input.Id, value.ToString());
+					list.Add(inputManager.Input.Id, value);
+					//var json = JsonConvert.SerializeObject(value);
+					//jsonObject.Add(inputManager.Input.Id, json);
 				}
 			}
-			return jsonObject;
+			return JsonConvert.SerializeObject(list);
 		}
 
 		private async Task<InvokeForm.Response> HandelForm()
@@ -239,7 +254,7 @@
 			}
 			catch (Exception ex)
 			{
-				Toast.MakeText(this.Activity, ex.Message, ToastLength.Long).Show();
+				Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
 			}
 
 			return new InvokeForm.Response();

@@ -5,7 +5,7 @@ namespace AndroidUiMetadateFramework.Core.Managers
 {
 	public interface IInputManager
 	{
-		View GetView(Activity activity);
+		View GetView(object inputCustomProperties);
 		object GetValue();
 		void SetValue(object value);
 	}

@@ -5,6 +5,6 @@ namespace AndroidUiMetadateFramework.Core.Managers
 {
 	public interface IOutputManager
 	{
-		View GetView(Activity activity,string name, object value, FormActivity formActivity);
+		View GetView(string name, object value, FormActivity formActivity);
 	}
 }
