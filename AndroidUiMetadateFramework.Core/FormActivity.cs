@@ -5,7 +5,6 @@
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Android.App;
-	using Android.Content.Res;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Managers;
@@ -67,10 +66,10 @@
 					manager.SetValue(value);
 				}
 				this.InputsManager.Add(new FormInputManager(input, manager, view));
-				if (input.DefaultValue != null)
-				{
-					manager.SetValue(input.DefaultValue.Id);
-				}
+				//if (input.DefaultValue != null)
+				//{
+				//	manager.SetValue(input.DefaultValue.Id);
+				//}
 				if (input.Hidden)
 				{
 					view.Visibility = ViewStates.Gone;
@@ -226,8 +225,6 @@
 				if (value != null)
 				{
 					list.Add(inputManager.Input.Id, value);
-					//var json = JsonConvert.SerializeObject(value);
-					//jsonObject.Add(inputManager.Input.Id, json);
 				}
 			}
 			return JsonConvert.SerializeObject(list);

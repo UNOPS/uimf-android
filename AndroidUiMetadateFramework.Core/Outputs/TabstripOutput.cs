@@ -4,10 +4,8 @@
 	using System.Linq;
 	using Android.App;
 	using Android.Content;
-	using Android.Content.Res;
 	using Android.Runtime;
 	using Android.Support.V4.View;
-	using Android.Util;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
