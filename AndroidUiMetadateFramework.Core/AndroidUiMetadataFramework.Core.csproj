@@ -48,7 +48,7 @@
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,14 +56,14 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
-    <Reference Include="UiMetadataFramework.Basic, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.5-beta\lib\netstandard1.6\UiMetadataFramework.Basic.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Basic, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.Core, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Core.0.0.5-beta\lib\netstandard1.6\UiMetadataFramework.Core.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Core, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Core.0.0.10-beta3\lib\netstandard2.0\UiMetadataFramework.Core.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.5-beta\lib\netstandard1.6\UiMetadataFramework.MediatR.dll</HintPath>
+    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.3.1\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
@@ -106,30 +106,52 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\AppSharedPreference.cs" />
     <Compile Include="Attributes\Output.cs" />
-    <Compile Include="Extension.cs" />
-    <Compile Include="FormActivity.cs" />
+    <Compile Include="Models\FormParameters.cs" />
+    <Compile Include="Models\FormInputManager.cs" />
+    <Compile Include="Models\Extension.cs" />
+    <Compile Include="Models\MyFormHandler.cs" />
     <Compile Include="Attributes\Input.cs" />
+    <Compile Include="Inputs\PaginatorInput.cs" />
+    <Compile Include="Inputs\PasswordInput.cs" />
+    <Compile Include="Inputs\BooleanInput.cs" />
+    <Compile Include="Inputs\MultiselectInput.cs" />
+    <Compile Include="Inputs\TypeaheadInput.cs" />
     <Compile Include="Inputs\DropdownInput.cs" />
     <Compile Include="Inputs\TextInput.cs" />
+    <Compile Include="Models\HttpResponse.cs" />
+    <Compile Include="Models\UiMetadataHttpRequestHelper.cs" />
+    <Compile Include="Models\ListViewHolder.cs" />
+    <Compile Include="Models\ListCustomAdapter.cs" />
     <Compile Include="Managers\OutputManager.cs" />
     <Compile Include="Managers\InputManager.cs" />
     <Compile Include="Managers\OutputManagerCollection.cs" />
     <Compile Include="Managers\InputManagerCollection.cs" />
-    <Compile Include="Inputs\DateInput.cs" />
+    <Compile Include="Inputs\DateTimeInput.cs" />
     <Compile Include="Inputs\NumericInput.cs" />
+    <Compile Include="Models\MyFormWrapper.cs" />
+    <Compile Include="Outputs\PaginationOutput.cs" />
+    <Compile Include="Outputs\ActionListOutput.cs" />
+    <Compile Include="Outputs\ListOutput.cs" />
     <Compile Include="Outputs\TableOutput.cs" />
     <Compile Include="Outputs\DateOutput.cs" />
     <Compile Include="Outputs\NumericOutput.cs" />
     <Compile Include="Outputs\FormLinkOutput.cs" />
     <Compile Include="Outputs\TabstripOutput.cs" />
+    <Compile Include="Outputs\BooleanOutput.cs" />
+    <Compile Include="Outputs\TextValueOutput.cs" />
     <Compile Include="Outputs\TextOutput.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\UiMetadataWebApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
+    <AndroidResource Include="Resources\layout\TabText.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\Values\Strings.xml" />
@@ -138,9 +160,7 @@
     <AndroidResource Include="Resources\drawable\ValidationBorders.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\TabStrip.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\TabBorders.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

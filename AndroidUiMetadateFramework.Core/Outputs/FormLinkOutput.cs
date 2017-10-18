@@ -1,57 +1,56 @@
 ﻿namespace AndroidUiMetadateFramework.Core.Outputs
 {
-	using System;
+	using System.Collections.Generic;
 	using Android.App;
 	using Android.Graphics;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
 	using UiMetadataFramework.Basic.Output;
+	using UiMetadataFramework.Core;
 
 	[Output(Type = "formlink")]
 	public class FormLinkOutput : IOutputManager
 	{
-		private Button Button { get; set; }
+		private LinearLayout Layout { get; set; }
 
-		public View GetView(string name, object value, FormActivity formActivity)
+		public View GetView(OutputFieldMetadata outputField,
+			object value,
+			MyFormHandler myFormHandler,
+			FormMetadata formMetadata,
+			List<FormInputManager> inputsManager)
 		{
-			var formLink = (FormLink)value;
-			this.Button = new Button(Application.Context) { Text = formLink.Label };
+			FormLink formLink = value.CastTObject<FormLink>();
+			this.Layout = new LinearLayout(Application.Context){Orientation = Orientation.Horizontal};
+			this.Layout.AddView(new TextView(Application.Context){Text = outputField.Label +": "});
+			var text = this.InitializeLink(formLink, myFormHandler);
+			
+			this.Layout.AddView(text);
+			return this.Layout;
+		}
 
-			this.Button.Click += async (sender, args) =>
+		public TextView InitializeLink(FormLink btn, MyFormHandler myFormHandler)
+		{
+			var text = new TextView(Application.Context) { Text = btn.Label };
+			text.SetBackgroundColor(Color.Transparent);
+			text.SetTextColor(Color.LightBlue);
+
+			text.Click += async (sender, args) =>
 			{
-				try
+				if (myFormHandler.AllFormsMetadata != null)
 				{
-					var linearLayout = new LinearLayout(Application.Context)
-					{
-						Orientation = Orientation.Vertical
-					};
-					var layout = await formActivity.GetIForm(formLink.Form, formLink.InputFieldValues);
-					linearLayout.SetBackgroundColor(Color.Black);
-					var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent,
-						ViewGroup.LayoutParams.WrapContent);
-					var closeBtn = new Button(Application.Context){Text = "Close"};
-					closeBtn.SetBackgroundColor(Color.Black);
-					linearLayout.AddView(layout, param);
-					param.Weight = 1;
-					linearLayout.AddView(closeBtn, param);
-					var metrics = Application.Context.Resources.DisplayMetrics;
-					PopupWindow popup = new PopupWindow(linearLayout, metrics.WidthPixels - 40, 3 * metrics.HeightPixels /4 );
-					popup.ShowAtLocation(this.Button, GravityFlags.Center, 5, 0);
-					closeBtn.Click += (o, eventArgs) =>
-					{
-						popup.Dismiss();
-					};
+					var formMetadata = myFormHandler.AllFormsMetadata[btn.Form];
+					myFormHandler.ReplaceFragment(formMetadata, btn.InputFieldValues);
 				}
-				catch (Exception ex)
+				else
 				{
-					
+					await myFormHandler.StartIFormAsync(btn.Form, btn.InputFieldValues);
 				}
-				
-			};
 
-			return this.Button;
+			};
+			return text;
 		}
 	}
 }

@@ -9,19 +9,24 @@
 	using AndroidUiMetadateFramework.Core.Models;
 	using UiMetadataFramework.Core;
 
-	[Output(Type = "number")]
-	public class NumericOutput : IOutputManager
+	[Output(Type = "list")]
+	public class ListOutput : IOutputManager
 	{
 		private TextView OutputText { get; set; }
 
-		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
+		public View GetView(OutputFieldMetadata outputField, 
+			object value, 
+			MyFormHandler myFormHandler, 
+			FormMetadata formMetadata, 
+			List<FormInputManager> inputsManager)
 		{
-			this.OutputText = new TextView(Application.Context);
-			if (value != null)
+			var list = value.CastTObject<IEnumerable<object>>();
+			this.OutputText = new TextView(Application.Context)
 			{
-				this.OutputText.Text = outputField.Label + ": " + value;
-			}
+				Text = outputField.Label + ": " + string.Join(", ", list)
+			};
 			return this.OutputText;
 		}
 	}
+
 }

@@ -2115,11 +2115,11 @@ namespace AndroidUiMetadateFramework.Core
 			// aapt resource value: 0x7f020063
 			public static int notification_icon_background = 2130837603;
 			
-			// aapt resource value: 0x7f020067
-			public static int notification_template_icon_bg = 2130837607;
-			
 			// aapt resource value: 0x7f020068
-			public static int notification_template_icon_low_bg = 2130837608;
+			public static int notification_template_icon_bg = 2130837608;
+			
+			// aapt resource value: 0x7f020069
+			public static int notification_template_icon_low_bg = 2130837609;
 			
 			// aapt resource value: 0x7f020064
 			public static int notification_tile_bg = 2130837604;
@@ -2128,7 +2128,10 @@ namespace AndroidUiMetadateFramework.Core
 			public static int notify_panel_notification_icon_bg = 2130837605;
 			
 			// aapt resource value: 0x7f020066
-			public static int ValidationBorders = 2130837606;
+			public static int TabBorders = 2130837606;
+			
+			// aapt resource value: 0x7f020067
+			public static int ValidationBorders = 2130837607;
 			
 			static Drawable()
 			{
@@ -2365,8 +2368,8 @@ namespace AndroidUiMetadateFramework.Core
 			// aapt resource value: 0x7f070048
 			public static int list_item = 2131165256;
 			
-			// aapt resource value: 0x7f070099
-			public static int masked = 2131165337;
+			// aapt resource value: 0x7f070098
+			public static int masked = 2131165336;
 			
 			// aapt resource value: 0x7f070085
 			public static int media_actions = 2131165317;
@@ -2400,12 +2403,6 @@ namespace AndroidUiMetadateFramework.Core
 			
 			// aapt resource value: 0x7f070087
 			public static int notification_main_column_container = 2131165319;
-			
-			// aapt resource value: 0x7f070096
-			public static int pager = 2131165334;
-			
-			// aapt resource value: 0x7f070097
-			public static int pager_title_strip = 2131165335;
 			
 			// aapt resource value: 0x7f070037
 			public static int parallax = 2131165239;
@@ -2587,6 +2584,9 @@ namespace AndroidUiMetadateFramework.Core
 			// aapt resource value: 0x7f07000b
 			public static int transition_scene_layoutid_cache = 2131165195;
 			
+			// aapt resource value: 0x7f070096
+			public static int tv = 2131165334;
+			
 			// aapt resource value: 0x7f070009
 			public static int up = 2131165193;
 			
@@ -2596,8 +2596,8 @@ namespace AndroidUiMetadateFramework.Core
 			// aapt resource value: 0x7f07000e
 			public static int view_offset_helper = 2131165198;
 			
-			// aapt resource value: 0x7f070098
-			public static int visible = 2131165336;
+			// aapt resource value: 0x7f070097
+			public static int visible = 2131165335;
 			
 			// aapt resource value: 0x7f070027
 			public static int withText = 2131165223;
@@ -2839,7 +2839,7 @@ namespace AndroidUiMetadateFramework.Core
 			public static int support_simple_spinner_dropdown_item = 2130903099;
 			
 			// aapt resource value: 0x7f03003c
-			public static int TabStrip = 2130903100;
+			public static int TabText = 2130903100;
 			
 			static Layout()
 			{

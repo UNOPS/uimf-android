@@ -1,126 +1,66 @@
 ﻿namespace AndroidApp
 {
-	using System;
 	using System.Collections.Generic;
-	using System.Reflection;
 	using Android.App;
+	using Android.Content;
 	using Android.OS;
 	using Android.Support.V7.App;
 	using Android.Views;
 	using Android.Widget;
-	using AndroidUiMetadateFramework.Core;
 	using AndroidUiMetadateFramework.Core.Inputs;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
 	using AndroidUiMetadateFramework.Core.Outputs;
-	using App.Core;
-	using MediatR;
-	using StructureMap;
-	using UiMetadataFramework.Basic.Output;
-	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
-	[Activity(Label = "My Magic App", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
+	[Activity(Label = "My Magic App", MainLauncher = false, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
 	public class MainActivity : AppCompatActivity, View.IOnClickListener
 	{
-		public List<View> AppLayouts = new List<View>();
-		private readonly Container Container = new Container();
+		public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
 		private Button Btn { get; set; }
-		private FormActivity FormActivity { get; set; }
-		private FormRegister FormRegister { get; set; }
+		private MyFormHandler MyFormHandler { get; set; }
 		private InputManagerCollection InputManager { get; set; }
 		private OutputManagerCollection OutputManager { get; set; }
-
-		public async void OnClick(View v)
-		{
-			if (v.Id == Resource.Id.button1)
-			{
-				await this.FormActivity.StartIForm(typeof(DoMagic));
-			}
-		}
-
-		public FormRegister GetRegisterForms()
-		{
-			try
-			{
-				var binder = new MetadataBinder();
-				binder.RegisterAssembly(typeof(StringOutputFieldBinding).GetTypeInfo().Assembly);
-				binder.RegisterAssembly(typeof(OutputFieldBinding).GetTypeInfo().Assembly);
-				this.FormRegister = new FormRegister(binder);
-				this.FormRegister.RegisterAssembly(typeof(DoMagic).GetTypeInfo().Assembly);
-			}
-			catch (Exception ex)
-			{
-				throw new Java.Lang.Exception(ex.Message);
-			}
-
-			return this.FormRegister;
-		}
-
-		public override void OnBackPressed()
-		{
-			this.AppLayouts.RemoveAt(this.AppLayouts.Count - 1);
-			if (this.AppLayouts.Count != 0)
-			{
-				this.SetContentView(this.AppLayouts[this.AppLayouts.Count - 1]);
-			}
-			else
-			{
-				this.Finish();
-			}
-		}
+		private UiMetadataWebApi UiMetadataWebApi { get; set; }
 
 		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
-			// Set our view from the "main" layout resource
 			this.SetContentView(Resource.Layout.Main);
-			this.AppLayouts.Add(this.FindViewById(Resource.Id.mainLayout));
 			this.RegisterInputOutputManagers();
-			this.ConfigureContainer();
-			this.FormRegister = this.Container.GetInstance<FormRegister>();
-			this.FormActivity = new FormActivity(this, this.Container.GetInstance<IMediator>(), this.FormRegister, this.InputManager, this.OutputManager,
-				this.AppLayouts);
+			this.UiMetadataWebApi = new UiMetadataWebApi
+			{
+				FormMetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
+				MetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
+				RunFormUrl = "http://10.0.2.2:50072/api/form/run"
+			};
+			this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.AppLayouts);
 			this.Btn = this.FindViewById<Button>(Resource.Id.button1);
 			this.Btn.SetOnClickListener(this);
-		}
-
-		private void ConfigureContainer()
-		{
-			this.Container.Configure(config =>
+			var appPreference = new AppSharedPreference(Application.Context);
+			if (string.IsNullOrEmpty(appPreference.GetSharedKey("Cookies")))
 			{
-				config.For<IMediator>().Use<Mediator>();
-				config.For<SingleInstanceFactory>().Use<SingleInstanceFactory>(ctx => t => ctx.GetInstance(t));
-				config.For<MultiInstanceFactory>().Use<MultiInstanceFactory>(ctx => t => ctx.GetAllInstances(t));
-				config.For<FormRegister>().Singleton().Use(() => this.GetRegisterForms());
-
-				config.Scan(_ =>
-				{
-					_.TheCallingAssembly();
-					_.AssemblyContainingType<DoMagic>();
-					_.AssemblyContainingType<InvokeForm>();
-					_.WithDefaultConventions();
-					_.AddAllTypesOf(typeof(IRequestHandler<,>));
-					_.AddAllTypesOf(typeof(INotificationHandler<>));
-					_.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>));
-					_.ConnectImplementationsToTypesClosing(typeof(IAsyncRequestHandler<,>));
-					_.ConnectImplementationsToTypesClosing(typeof(INotificationHandler<>));
-					_.ConnectImplementationsToTypesClosing(typeof(IAsyncNotificationHandler<>));
-				});
-			});
+				var view = this.MyFormHandler.StartIFormAsync("login");
+			}				 
+			else
+			{
+				Intent i = new Intent(this, typeof(FormsActivity));
+				this.StartActivity(i);
+			}
 		}
 
 		private void RegisterInputOutputManagers()
 		{
 			this.InputManager = new InputManagerCollection();
 			this.InputManager.RegisterAssembly(typeof(TextInput).Assembly);
-			this.InputManager.RegisterAssembly(typeof(NumericInput).Assembly);
-			this.InputManager.RegisterAssembly(typeof(DateInput).Assembly);
 
 			this.OutputManager = new OutputManagerCollection();
 			this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
-			this.OutputManager.RegisterAssembly(typeof(NumericOutput).Assembly);
-			this.OutputManager.RegisterAssembly(typeof(DateOutput).Assembly);
-			this.OutputManager.RegisterAssembly(typeof(TableOutput).Assembly);
+			this.OutputManager.RegisterAssembly(typeof(InstallmentList).Assembly);
+		}
+
+		public void OnClick(View v)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

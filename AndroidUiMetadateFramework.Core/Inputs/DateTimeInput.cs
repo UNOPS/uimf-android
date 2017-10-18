@@ -6,30 +6,34 @@
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
 
 	[Input(Type = "datetime")]
-	public class DateInput : IInputManager
+	public class DateTimeInput : IInputManager
 	{
-		private DatePicker dateInput { get; set; }
+		private DatePicker DateInput { get; set; }
 
 		public View GetView( object inputCustomProperties)
 		{
-			this.dateInput = new DatePicker(Application.Context)
+			this.DateInput = new DatePicker(Application.Context)
 			{
 				ScaleX = 0.5f,
 				ScaleY = 0.5f
 			};
-			return this.dateInput;
+			return this.DateInput;
 		}
 
 		public object GetValue()
 		{
-			return this.dateInput.DateTime;
+			return this.DateInput.DateTime;
 		}
 
 		public void SetValue(object value)
 		{
-			this.dateInput.DateTime = (DateTime)value;
+			this.DateInput.DateTime = value.CastTObject<DateTime>();
+			
 		}
 	}
 }

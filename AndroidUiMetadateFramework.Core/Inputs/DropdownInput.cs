@@ -7,6 +7,9 @@
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Core;
 
@@ -20,7 +23,7 @@
 		public View GetView(object inputCustomProperties)
 		{
 			this.Spinner = new Spinner(Application.Context);
-			var list = (DropdownProperties)inputCustomProperties;
+			DropdownProperties list = inputCustomProperties.CastTObject<DropdownProperties>();			
 			this.Items = list.Items;
 			ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context, Android.Resource.Layout.SimpleSpinnerItem, this.Items.Select(a => a.Label).ToArray());
 			this.Spinner.Adapter = adapter;
@@ -36,7 +39,9 @@
 
 		public void SetValue(object value)
 		{
-			var selectedItem = this.Items.FirstOrDefault(a => a.Value == value);
+			var strValue = value.CastTObject<string>();
+			DropdownItem selectedItem = this.Items.FirstOrDefault(a => a.Value == strValue);
+
 			if (selectedItem != null)
 			{
 				var selectedPosition = this.Items.IndexOf(selectedItem);

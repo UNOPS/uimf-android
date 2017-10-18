@@ -9,18 +9,14 @@
 	using AndroidUiMetadateFramework.Core.Models;
 	using UiMetadataFramework.Core;
 
-	[Output(Type = "number")]
-	public class NumericOutput : IOutputManager
+	[Output(Type = "boolean")]
+	public class BooleanOutput : IOutputManager
 	{
 		private TextView OutputText { get; set; }
 
 		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
-			this.OutputText = new TextView(Application.Context);
-			if (value != null)
-			{
-				this.OutputText.Text = outputField.Label + ": " + value;
-			}
+			this.OutputText = new TextView(Application.Context) { Text = outputField.Label + ": " + value };
 			return this.OutputText;
 		}
 	}

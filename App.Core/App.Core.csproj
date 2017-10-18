@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.5-beta" />
-    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.5-beta" />
-    <PackageReference Include="UiMetadataFramework.Mediatr" Version="0.0.5-beta" />
+    <PackageReference Include="uimetadataframework.basic" Version="0.0.7-beta2" />
+    <PackageReference Include="uimetadataframework.core" Version="0.0.7-beta" />
+    <PackageReference Include="uimetadataframework.mediatr" Version="0.0.7-beta" />
   </ItemGroup>
 
 </Project>

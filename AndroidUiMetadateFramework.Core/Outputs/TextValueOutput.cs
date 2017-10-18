@@ -7,20 +7,18 @@
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
+	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 
-	[Output(Type = "number")]
-	public class NumericOutput : IOutputManager
+	[Output(Type = "text-value")]
+	public class TextValueOutput : IOutputManager
 	{
 		private TextView OutputText { get; set; }
 
 		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
-			this.OutputText = new TextView(Application.Context);
-			if (value != null)
-			{
-				this.OutputText.Text = outputField.Label + ": " + value;
-			}
+			var textValue = value.CastTObject<TextValue<object>>();
+			this.OutputText = new TextView(Application.Context) { Text = outputField.Label + ": " + textValue.Value };
 			return this.OutputText;
 		}
 	}

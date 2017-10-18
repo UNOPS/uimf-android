@@ -4,75 +4,64 @@
 	using System.Linq;
 	using Android.App;
 	using Android.Content;
-	using Android.Runtime;
-	using Android.Support.V4.View;
+	using Android.Graphics;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
 	using UiMetadataFramework.Basic.Output;
+	using UiMetadataFramework.Core;
 
 	[Output(Type = "tabstrip")]
 	public class TabstripOutput : IOutputManager
 	{
 		private RelativeLayout LinearLayout { get; set; }
 
-		public View GetView(string name, object value, FormActivity formActivity)
+		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
 			LayoutInflater inflater = (LayoutInflater)Application.Context
 				.GetSystemService(Context.LayoutInflaterService);
-
-			var heightInDp = Application.Context.ScreenHeightDp();
 			this.LinearLayout = new RelativeLayout(Application.Context);
-			View rowView = inflater.Inflate(Resource.Layout.TabStrip, this.LinearLayout, false);
-			var tabstrip = (Tabstrip)value;
-			var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, heightInDp);
-			ViewPager viewPager = rowView.FindViewById<ViewPager>(Resource.Id.pager);
-			viewPager.LayoutParameters = param;
-			viewPager.Adapter = new CustomPagerAdapter(tabstrip.Tabs.ToList(), formActivity);
-			this.LinearLayout.AddView(viewPager);
+			View rowView = inflater.Inflate(Resource.Layout.TabText, this.LinearLayout, false);
+			var tabstrip = value.CastTObject<Tabstrip>();
+			var currentTab = tabstrip.Tabs.SingleOrDefault(a => a.Form == tabstrip.CurrentTab);
+			var linearL = new LinearLayout(Application.Context){Orientation = Orientation.Horizontal};
+			foreach (var tab in tabstrip.Tabs)
+			{
+				if(tab != null)
+				{
+					var tv = new TextView(Application.Context);
+					if (tab == currentTab)
+					{
+						tv = rowView.FindViewById<TextView>(Resource.Id.tv);
+						tv.SetTextColor(Color.White);
+					}
+					tv.Text = tab.Label;
+					tv.SetPadding(10, 5, 10, 5);
+					tv.Click += async (sender, args) =>
+					{
+						if (myFormHandler.AllFormsMetadata != null)
+						{
+							var metadata = myFormHandler.AllFormsMetadata[tab.Form];
+							var fragment = new MyFormWrapper(metadata, myFormHandler, myFormHandler.Activity, tab.InputFieldValues);
+							if (myFormHandler.ContentResourceId.HasValue)
+							{
+								fragment.UpdateFragment(myFormHandler.ContentResourceId.Value);
+							}							
+						}
+						else
+						{
+							await myFormHandler.StartIFormAsync(tab.Form, tab.InputFieldValues);
+						}
+
+					};
+					linearL.AddView(tv);
+				}
+				
+			}
+			this.LinearLayout.AddView(linearL);
 			return this.LinearLayout;
-		}
-
-	
-
-	}
-
-	public class CustomPagerAdapter : PagerAdapter
-	{
-		private readonly FormActivity formActivity;
-
-		public CustomPagerAdapter(List<Tab> tabs, FormActivity formActivity)
-		{
-			this.formActivity = formActivity;
-			this.Tabs = tabs;
-		}
-
-		public override int Count => this.Tabs.Count;
-		private List<Tab> Tabs { get; }
-
-		public override void DestroyItem(View container, int position, Java.Lang.Object view)
-		{
-			var viewPager = container.JavaCast<ViewPager>();
-			viewPager.RemoveView(view as View);
-		}
-
-		public override Java.Lang.ICharSequence GetPageTitleFormatted(int position)
-		{
-			return new Java.Lang.String(this.Tabs[position].Label);
-		}
-
-		public override Java.Lang.Object InstantiateItem(View container, int position)
-		{
-			var form = this.formActivity.GetIForm(this.Tabs[position].Form, this.Tabs[position].InputFieldValues).Result;
-			var viewPager = container.JavaCast<ViewPager>();
-			viewPager.AddView(form);
-			return form;
-		}
-
-		public override bool IsViewFromObject(View view, Java.Lang.Object obj)
-		{
-			return view == obj;
 		}
 	}
 }
