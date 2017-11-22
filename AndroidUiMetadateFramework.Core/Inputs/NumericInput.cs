@@ -7,13 +7,14 @@
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
 
-	[Input(Type = "number")]
+    [Input(Type = "number")]
 	public class NumericInput : IInputManager
 	{
 		private EditText InputText { get; set; }
 
-		public View GetView( object inputCustomProperties)
+		public View GetView( object inputCustomProperties, MyFormHandler myFormHandler)
 		{
 			this.InputText = new EditText(Application.Context) { InputType = InputTypes.ClassNumber };
 			return this.InputText;

@@ -14,7 +14,11 @@
 	{
 		private LinearLayout OutputList { get; set; }
 
-		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
+		public View GetView(OutputFieldMetadata outputField, 
+			object value, 
+			MyFormHandler myFormHandler, 
+			FormMetadata formMetadata, 
+			List<FormInputManager> inputsManager)
 		{
 			this.OutputList = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
 			var label = new TextView(Application.Context) { Text = outputField.Label };

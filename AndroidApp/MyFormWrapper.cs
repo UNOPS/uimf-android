@@ -1,13 +1,14 @@
-﻿namespace AndroidUiMetadateFramework.Core.Models
+﻿namespace AndroidApp
 {
-	using System.Collections.Generic;
-	using Android.App;
-	using Android.OS;
-	using Android.Views;
-	using Android.Widget;
-	using UiMetadataFramework.Core;
+    using System.Collections.Generic;
+    using Android.App;
+    using Android.OS;
+    using Android.Views;
+    using Android.Widget;
+    using AndroidUiMetadateFramework.Core.Models;
+    using UiMetadataFramework.Core;
 
-	public class MyFormWrapper : Fragment
+    public class MyFormWrapper : Fragment
 	{
 		public MyFormHandler MyFormHandler { get; set; }
 		public FormMetadata FormMetadata { get; set; }

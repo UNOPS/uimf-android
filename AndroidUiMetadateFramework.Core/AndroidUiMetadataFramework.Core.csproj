@@ -56,14 +56,14 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
-    <Reference Include="UiMetadataFramework.Basic, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.Basic.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Basic, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.Core, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Core.0.0.10-beta3\lib\netstandard2.0\UiMetadataFramework.Core.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Core, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Core.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.Core.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.MediatR.dll</HintPath>
+    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.3.1\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
@@ -106,11 +106,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\EventHandler.cs" />
+    <Compile Include="EventHandlers\BindToOutputEventHandler.cs" />
+    <Compile Include="Managers\EventHandlerManagerCollection.cs" />
+    <Compile Include="Managers\EventHandlerManager.cs" />
+    <Compile Include="Managers\EventsManager.cs" />
     <Compile Include="Models\AppSharedPreference.cs" />
     <Compile Include="Attributes\Output.cs" />
     <Compile Include="Models\FormParameters.cs" />
     <Compile Include="Models\FormInputManager.cs" />
     <Compile Include="Models\Extension.cs" />
+    <Compile Include="Models\FormWrapper.cs" />
     <Compile Include="Models\MyFormHandler.cs" />
     <Compile Include="Attributes\Input.cs" />
     <Compile Include="Inputs\PaginatorInput.cs" />
@@ -121,6 +127,7 @@
     <Compile Include="Inputs\DropdownInput.cs" />
     <Compile Include="Inputs\TextInput.cs" />
     <Compile Include="Models\HttpResponse.cs" />
+    <Compile Include="Models\TypeaheadResponse.cs" />
     <Compile Include="Models\UiMetadataHttpRequestHelper.cs" />
     <Compile Include="Models\ListViewHolder.cs" />
     <Compile Include="Models\ListCustomAdapter.cs" />
@@ -130,7 +137,6 @@
     <Compile Include="Managers\InputManagerCollection.cs" />
     <Compile Include="Inputs\DateTimeInput.cs" />
     <Compile Include="Inputs\NumericInput.cs" />
-    <Compile Include="Models\MyFormWrapper.cs" />
     <Compile Include="Outputs\PaginationOutput.cs" />
     <Compile Include="Outputs\ActionListOutput.cs" />
     <Compile Include="Outputs\ListOutput.cs" />

@@ -7,6 +7,7 @@
 	using Android.Support.V7.App;
 	using Android.Views;
 	using Android.Widget;
+	using AndroidUiMetadateFramework.Core.EventHandlers;
 	using AndroidUiMetadateFramework.Core.Inputs;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
@@ -20,20 +21,22 @@
 		private MyFormHandler MyFormHandler { get; set; }
 		private InputManagerCollection InputManager { get; set; }
 		private OutputManagerCollection OutputManager { get; set; }
-		private UiMetadataWebApi UiMetadataWebApi { get; set; }
+	    public EventHandlerManagerCollection EventManager { get; set; }
+        private UiMetadataWebApi UiMetadataWebApi { get; set; }
+	    public CustomFormWrapper FormWrapper { get; set; }
 
-		protected override void OnCreate(Bundle bundle)
+        protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
 			this.SetContentView(Resource.Layout.Main);
-			this.RegisterInputOutputManagers();
+			this.RegisterManagers();
 			this.UiMetadataWebApi = new UiMetadataWebApi
 			{
 				FormMetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
 				MetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
 				RunFormUrl = "http://10.0.2.2:50072/api/form/run"
 			};
-			this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.AppLayouts);
+			this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager, this.FormWrapper);
 			this.Btn = this.FindViewById<Button>(Resource.Id.button1);
 			this.Btn.SetOnClickListener(this);
 			var appPreference = new AppSharedPreference(Application.Context);
@@ -48,7 +51,7 @@
 			}
 		}
 
-		private void RegisterInputOutputManagers()
+		private void RegisterManagers()
 		{
 			this.InputManager = new InputManagerCollection();
 			this.InputManager.RegisterAssembly(typeof(TextInput).Assembly);
@@ -56,7 +59,9 @@
 			this.OutputManager = new OutputManagerCollection();
 			this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
 			this.OutputManager.RegisterAssembly(typeof(InstallmentList).Assembly);
-		}
+		    this.EventManager = new EventHandlerManagerCollection();
+		    this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
+        }
 
 		public void OnClick(View v)
 		{

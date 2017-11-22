@@ -1,11 +1,12 @@
-﻿using Android.App;
-using Android.Views;
+﻿using Android.Views;
 
 namespace AndroidUiMetadateFramework.Core.Managers
 {
-	public interface IInputManager
+    using AndroidUiMetadateFramework.Core.Models;
+
+    public interface IInputManager
 	{
-		View GetView(object inputCustomProperties);
+		View GetView(object inputCustomProperties, MyFormHandler myFormHandler);
 		object GetValue();
 		void SetValue(object value);
 	}

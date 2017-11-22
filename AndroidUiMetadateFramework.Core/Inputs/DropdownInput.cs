@@ -8,8 +8,6 @@
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
-	using Newtonsoft.Json;
-	using Newtonsoft.Json.Linq;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Core;
 
@@ -20,27 +18,37 @@
 		private IList<DropdownItem> Items { get; set; }
 		private InputFieldMetadata metadata;
 
-		public View GetView(object inputCustomProperties)
+		public View GetView(object inputCustomProperties, MyFormHandler myFormHandler)
 		{
-			this.Spinner = new Spinner(Application.Context);
-			DropdownProperties list = inputCustomProperties.CastTObject<DropdownProperties>();			
-			this.Items = list.Items;
-			ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context, Android.Resource.Layout.SimpleSpinnerItem, this.Items.Select(a => a.Label).ToArray());
+			//this.Spinner = new Spinner(myFormHandler.Activity, SpinnerMode.Dialog);
+		    this.Spinner = new Spinner(Application.Context);
+            DropdownProperties list = inputCustomProperties.CastTObject<DropdownProperties>();
+            this.Items = list.Items;
+		    this.Items.Insert(0, new DropdownItem
+		    {
+		        Label = "",
+		        Value = ""
+		    });
+            ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context, Android.Resource.Layout.SimpleSpinnerItem, this.Items.Select(a => a.Label).ToArray());
 			this.Spinner.Adapter = adapter;
 			return this.Spinner;
 		}
 
 		public object GetValue()
 		{
-			var selectedPosition = this.Spinner.SelectedItemPosition;
-			var value = new DropdownValue<string>(this.Items[selectedPosition].Value);
-			return value;
+		    if (this.Spinner.SelectedItemPosition != 0)
+		    {
+		        var selectedPosition = this.Spinner.SelectedItemPosition;
+		        var value = new DropdownValue<string>(this.Items[selectedPosition].Value);
+		        return value;
+            }
+		    return null;
 		}
 
 		public void SetValue(object value)
 		{
-			var strValue = value.CastTObject<string>();
-			DropdownItem selectedItem = this.Items.FirstOrDefault(a => a.Value == strValue);
+			var dropdownValue = value.CastTObject<DropdownValue<object>>();
+			DropdownItem selectedItem = this.Items.FirstOrDefault(a => a.Value.Equals(dropdownValue.Value));
 
 			if (selectedItem != null)
 			{

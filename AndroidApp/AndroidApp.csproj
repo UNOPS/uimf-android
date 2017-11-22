@@ -72,14 +72,14 @@
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
-    <Reference Include="UiMetadataFramework.Basic, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.Basic.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Basic, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Basic.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.Core, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.Core.0.0.10-beta3\lib\netstandard2.0\UiMetadataFramework.Core.dll</HintPath>
+    <Reference Include="UiMetadataFramework.Core, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.Core.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.Core.dll</HintPath>
     </Reference>
-    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.10.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.10-beta\lib\netstandard2.0\UiMetadataFramework.MediatR.dll</HintPath>
+    <Reference Include="UiMetadataFramework.MediatR, Version=0.0.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UiMetadataFramework.MediatR.0.0.11-beta\lib\netstandard2.0\UiMetadataFramework.MediatR.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.25.3.1\lib\MonoAndroid70\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
@@ -122,6 +122,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomFormWrapper.cs" />
     <Compile Include="MyActionBarDrawerToggle.cs" />
     <Compile Include="InstallmentList.cs" />
     <Compile Include="FormsActivity.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="MenuMetadata.cs" />
     <Compile Include="MyForms.cs" />
     <Compile Include="DrawerListAdapter.cs" />
+    <Compile Include="MyFormWrapper.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -12,7 +12,7 @@
 	{
 		private CheckBox InputBoolean { get; set; }
 
-		public View GetView(object inputCustomProperties)
+		public View GetView(object inputCustomProperties, MyFormHandler myFormHandler)
 		{
 			this.InputBoolean = new CheckBox(Application.Context);
 			return this.InputBoolean;

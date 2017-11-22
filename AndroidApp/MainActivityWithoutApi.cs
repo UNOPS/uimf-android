@@ -8,6 +8,7 @@
 	using Android.Support.V7.App;
 	using Android.Views;
 	using Android.Widget;
+	using AndroidUiMetadateFramework.Core.EventHandlers;
 	using AndroidUiMetadateFramework.Core.Inputs;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
@@ -29,8 +30,9 @@
 		private FormRegister FormRegister { get; set; }
 		private InputManagerCollection InputManager { get; set; }
 		private OutputManagerCollection OutputManager { get; set; }
-		
-		public async void OnClick(View v)
+	    public EventHandlerManagerCollection EventManager { get; set; }
+
+        public async void OnClick(View v)
 		{
 			if (v.Id == Resource.Id.button1)
 			{
@@ -74,11 +76,11 @@
 			base.OnCreate(bundle);
 			this.SetContentView(Resource.Layout.Main);
 			//this.AppLayouts.Add(this.FindViewById(Resource.Id.mainLayout));
-			this.RegisterInputOutputManagers();
+			this.RegisterManagers();
 			this.ConfigureContainer();
 			this.FormRegister = this.Container.GetInstance<FormRegister>();
 			this.MyFormHandler = new MyFormHandler(this, this.Container.GetInstance<IMediator>(), this.FormRegister, this.InputManager, this.OutputManager,
-				this.AppLayouts);
+				this.EventManager);
 			this.Btn = this.FindViewById<Button>(Resource.Id.button1);
 			this.Btn.SetOnClickListener(this);
 		}
@@ -108,7 +110,7 @@
 			});
 		}
 
-		private void RegisterInputOutputManagers()
+		private void RegisterManagers()
 		{
 			this.InputManager = new InputManagerCollection();
 			this.InputManager.RegisterAssembly(typeof(TextInput).Assembly);
@@ -116,6 +118,11 @@
 			this.OutputManager = new OutputManagerCollection();
 			this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
 			this.OutputManager.RegisterAssembly(typeof(InstallmentList).Assembly);
-		}
+
+		    this.EventManager = new EventHandlerManagerCollection();
+            this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
+        }
+
+	    
 	}
 }

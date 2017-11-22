@@ -11,6 +11,7 @@
 	using Android.Support.V7.App;
 	using Android.Support.V7.Widget;
 	using Android.Views;
+	using AndroidUiMetadateFramework.Core.EventHandlers;
 	using AndroidUiMetadateFramework.Core.Inputs;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
@@ -20,7 +21,7 @@
 	using Newtonsoft.Json.Linq;
 	using UiMetadataFramework.Core;
 
-	[Activity(Label = "My Magic App", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
+	[Activity(Label = "SPGS", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
 	public class FormsActivity : AppCompatActivity, DrawerListAdapter.IOnItemClickListener
 	{
 		public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
@@ -34,9 +35,10 @@
 		private List<string> MenuTitles { get; set; }
 		private UiMetadataWebApi UiMetadataWebApi { get; set; }
 		private Dictionary<string,FormMetadata> AllForms { get; set; }
+	    public EventHandlerManagerCollection EventManager { get; set; }
 
-		/* The click listener for RecyclerView in the navigation drawer */
-		public void OnClick(View view, int position)
+        /* The click listener for RecyclerView in the navigation drawer */
+        public void OnClick(View view, int position)
 		{
 			this.SelectItem(position);
 		}
@@ -47,7 +49,7 @@
 			if (this.AppLayouts.Count != 0)
 			{
 				this.AppLayouts[this.AppLayouts.Count - 1].UpdateFragment(Resource.Id.content_frame);
-			}
+            }
 			else
 			{
 				this.Finish();
@@ -80,16 +82,19 @@
 				MetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
 				RunFormUrl = "http://10.0.2.2:50072/api/form/run"
 			};
-			this.RegisterInputOutputManagers();			
+			this.RegisterManagers();			
 			this.GetAllFormsMetadata();
-			this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, 
-				 this.AppLayouts, this.AllForms, Resource.Id.content_frame);
+		    this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.content_frame);
+            this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager,
+                 this.FormWrapper, this.AllForms);
 			this.InitializeDrawerLayout();
 			if(this.AppLayouts.Count == 0)
 			this.AppLayouts.Add(new MyFormWrapper(this));
 		}
 
-		private void InitializeDrawerLayout()
+	    public CustomFormWrapper FormWrapper { get; set; }
+
+	    private void InitializeDrawerLayout()
 		{
 			this.DrawerLayout = this.FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
 			this.DrawerList = this.FindViewById<RecyclerView>(Resource.Id.left_drawer);
@@ -169,7 +174,7 @@
 			this.SupportActionBar.Title = title.ToString();
 		}
 
-		private void RegisterInputOutputManagers()
+		private void RegisterManagers()
 		{
 			this.InputManager = new InputManagerCollection();
 			this.InputManager.RegisterAssembly(typeof(TextInput).Assembly);
@@ -177,13 +182,17 @@
 			this.OutputManager = new OutputManagerCollection();
 			this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
 			this.OutputManager.RegisterAssembly(typeof(InstallmentList).Assembly);
-		}
 
-		private void SelectItem(int position)
+		    this.EventManager = new EventHandlerManagerCollection();
+		    this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
+        }
+
+	    private void SelectItem(int position)
 		{
 			if (this.MenuItems[position].GetType() == typeof(FormMetadata))
 			{
-				this.MyFormHandler.ReplaceFragment((FormMetadata)this.MenuItems[position]);
+                this.FormWrapper.UpdateView(this.MyFormHandler, (FormMetadata)this.MenuItems[position]);
+				//this.MyFormHandler.ReplaceFragment((FormMetadata)this.MenuItems[position]);
 				// update selected item title, then close the drawer
 				this.Title = this.MenuTitles[position];
 				this.DrawerLayout.CloseDrawer(this.DrawerList);

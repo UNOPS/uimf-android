@@ -2,16 +2,19 @@
 {
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Threading.Tasks;
 	using Android.App;
 	using Android.Content;
 	using Android.Views;
 	using Android.Widget;
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
+	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
+	using UiMetadataFramework.MediatR;
 
-	public static class Extension
+    public static class Extension
 	{
 		public static T CastTObject<T>(this object obj)
 		{
@@ -106,5 +109,32 @@
 			var adapter = new ListCustomAdapter<object>(itemList.ToList(), outputFieldProperty, myFormHandler);
 			listView.Adapter = adapter;
 		}
-	}
+
+	    public static IEnumerable<object> GetTypeaheadSource(this TypeaheadCustomProperties customProperties, MyFormHandler myFormHandler)
+	    {
+	        if (customProperties.Source is string)
+	        {
+	            var dataSource = customProperties.Source.ToString();
+	            var request = new InvokeForm.Request
+	            {
+	                Form = dataSource
+	            };
+	            var result = Task.Run(
+	                () => myFormHandler.InvokeFormAsync(new[] { request }, false));
+
+	            var response = result.Result;
+	            var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
+	            if (typeahead != null)
+	            {
+	                return typeahead.Items;
+                }
+	        }
+	        else
+	        {
+	            return (IEnumerable<object>)customProperties.Source;
+
+	        }
+	        return new List<object>();
+	    }
+    }
 }

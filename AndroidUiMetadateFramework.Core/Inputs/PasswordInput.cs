@@ -6,6 +6,7 @@
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
+	using AndroidUiMetadateFramework.Core.Models;
 	using UiMetadataFramework.Basic.Input;
 
 	[Input(Type = "password")]
@@ -13,7 +14,7 @@
 	{
 		private EditText InputText { get; set; }
 
-		public View GetView(object inputCustomProperties)
+		public View GetView(object inputCustomProperties, MyFormHandler myFormHandler)
 		{
 			this.InputText = new EditText(Application.Context)
 			{

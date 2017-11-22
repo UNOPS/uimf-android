@@ -5,6 +5,7 @@
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Android.App;
+	using Android.Graphics;
 	using Android.Views;
 	using Android.Widget;
 	using AndroidUiMetadateFramework.Core.Managers;
@@ -18,50 +19,52 @@
 
 	public class MyFormHandler
 	{
-		public MyFormHandler(Activity activity,
+	    public MyFormHandler(Activity activity,
 			IMediator mediator,
 			FormRegister formRegister,
 			InputManagerCollection inputManager,
 			OutputManagerCollection outputManager,
-			List<MyFormWrapper> appFragments)
+		    EventHandlerManagerCollection eventHandlerManager)
 		{
-			this.Activity = activity;
+		    this.EventHandlerManager = eventHandlerManager;
+		    this.Activity = activity;
 			this.Mediator = mediator;
 			this.InputManagerCollection = inputManager;
 			this.OutputManagerCollection = outputManager;
 			this.FormRegister = formRegister;
-			this.AppFragments = appFragments;
 		}
 
 		public MyFormHandler(Activity activity,
 			UiMetadataWebApi uiMetadataWebApi,
 			InputManagerCollection inputManager,
 			OutputManagerCollection outputManager,
-			List<MyFormWrapper> appFragments,
-			Dictionary<string, FormMetadata> allForms = null,
-			int? contentResourceId = null)
+		    EventHandlerManagerCollection eventHandlerManager,
+		    IFormWrapper formWrapper,
+            Dictionary<string, FormMetadata> allForms = null)
 		{
-			this.Activity = activity;
+		    this.EventHandlerManager = eventHandlerManager;
+            this.Activity = activity;
 			this.InputManagerCollection = inputManager;
 			this.OutputManagerCollection = outputManager;
 			this.AllFormsMetadata = allForms;
 			this.UiMetadataWebApi = uiMetadataWebApi;
 			this.AppPreference = new AppSharedPreference(Application.Context);
-			this.AppFragments = appFragments;
-			this.ContentResourceId = contentResourceId;
+			this.FormWrapper = formWrapper;
 		}
 
-		public Activity Activity { get; }
+	    public IFormWrapper FormWrapper { get; set; }
+
+	    public Activity Activity { get; }
 		public Dictionary<string, FormMetadata> AllFormsMetadata { get; set; }
-		public List<MyFormWrapper> AppFragments { get; set; }
-		public int? ContentResourceId { get; set; }
+		//public int? ContentResourceId { get; set; }
 
 		public OutputManagerCollection OutputManagerCollection { get; }
-		private AppSharedPreference AppPreference { get; }
+	    public AppSharedPreference AppPreference { get; }
 		private FormRegister FormRegister { get; }
-		private InputManagerCollection InputManagerCollection { get; }
-		private IMediator Mediator { get; }
-		private UiMetadataWebApi UiMetadataWebApi { get; }
+	    public InputManagerCollection InputManagerCollection { get; }
+	    public EventHandlerManagerCollection EventHandlerManager { get; }
+        private IMediator Mediator { get; }
+		public UiMetadataWebApi UiMetadataWebApi { get; }
 
 		public void DrawInputs(LinearLayout layout, FormParameters formParameters, List<FormInputManager> inputsManager)
 		{
@@ -78,7 +81,7 @@
 
 				var manager = this.InputManagerCollection.GetManager(input.Type);
 
-				var view = manager.GetView(input.CustomProperties);
+				var view = manager.GetView(input.CustomProperties,this);
 				var value = formParameters.Parameters?.SingleOrDefault(a => a.Key.Equals(input.Id)).Value;
 				if (value != null)
 				{
@@ -164,7 +167,10 @@
 					Form = formMetadata.Id,
 					InputFieldValues = obj
 				};
-				object resultData = null;
+                // run on form posting events
+			    EventsManager.OnFormPostingEvent(formMetadata, inputsManager);
+
+                object resultData = null;
 				if (this.UiMetadataWebApi != null)
 				{
 					var result = await this.InvokeFormAsync(new[] { request });
@@ -179,6 +185,9 @@
 					resultData = response.Data;
 				}
 
+			    // run on response received events
+                EventsManager.OnResponseReceivedEvent(formMetadata, inputsManager, resultData);
+
 				return new InvokeForm.Response
 				{
 					Data = resultData
@@ -191,15 +200,15 @@
 			}
 		}
 
-		public void ReplaceFragment(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null)
-		{
-			var fragment = new MyFormWrapper(formMetadata, this, this.Activity, inputFieldValues);
-			this.AppFragments?.Add(fragment);
-			if (this.ContentResourceId.HasValue)
-			{
-				fragment.UpdateFragment(this.ContentResourceId.Value);
-			}
-		}
+		//public void ReplaceFragment(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null)
+		//{
+		//	var fragment = new MyFormWrapper(formMetadata, this, this.Activity, inputFieldValues);
+		//	this.AppFragments?.Add(fragment);
+		//	if (this.ContentResourceId.HasValue)
+		//	{
+		//		fragment.UpdateFragment(this.ContentResourceId.Value);
+		//	}
+		//}
 
 		public async Task<View> StartIFormAsync(string form, IDictionary<string, object> inputFieldValues = null)
 		{
@@ -249,8 +258,20 @@
 
 					if (formParameters.Form.InputFields.Count(a => !a.Hidden) > 0)
 					{
-						var btn = new Button(Application.Context) { Text = "Submit" };
+					    var submitLabel = "Submit";
+					    if (formParameters.Form.CustomProperties != null)
+					    {
+					        var customeProperties = (JObject)formParameters.Form.CustomProperties;
+					        var submitbuttonlabel = customeProperties.GetValue("submitButtonLabel")?.ToString();
+
+                            if (!string.IsNullOrEmpty(submitbuttonlabel))
+					        {
+					            submitLabel = submitbuttonlabel;
+                            }					        
+					    }
+					    var btn = new Button(Application.Context) { Text = submitLabel };
 						linearLayout.AddView(btn, linearLayout.MatchParentWrapContent());
+                        btn.SetBackgroundColor(new Color(22, 156, 133));
 
 						btn.Click += async (sender, args) =>
 						{
@@ -259,9 +280,12 @@
 						};
 					}
 				}
-				if (formParameters.Form.PostOnLoad)
+			    // run on response handled events
+			    EventsManager.OnFormLoadedEvent(formParameters);
+
+                if (formParameters.Form.PostOnLoad)
 				{
-					var task = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager));
+					var task = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager, formParameters.Form.PostOnLoadValidation));
 					result = task.Result;
 					this.DrawOutput(resultLayout, result, formParameters.Form, inputsManager);
 				}
@@ -281,7 +305,9 @@
 					if (this.AllFormsMetadata != null)
 					{
 						var metadata = this.AllFormsMetadata[reloadResponse.Form];
-						this.ReplaceFragment(metadata, reloadResponse.InputFieldValues);
+					    this.FormWrapper.UpdateView(this,metadata, reloadResponse.InputFieldValues);
+
+                        //this.ReplaceFragment(metadata, reloadResponse.InputFieldValues);
 					}
 					else
 					{
@@ -314,7 +340,9 @@
 						}
 					}
 				}
-			}
+			    // run on response handled events
+                EventsManager.OnResponseHandledEvent(this, formMetadata, inputsManager, result);
+            }
 		}
 
 		private object GetFormValues(List<FormInputManager> inputsManager)
@@ -331,11 +359,12 @@
 			return JsonConvert.SerializeObject(list);
 		}
 
-		private async Task<List<InvokeForm.Response>> InvokeFormAsync(object param)
+		public async Task<List<InvokeForm.Response>> InvokeFormAsync(object param, bool setCookies = true)
 		{
 			var response = await UiMetadataHttpRequestHelper.InvokeForm(this.UiMetadataWebApi.RunFormUrl, this.AppPreference.GetSharedKey("Cookies"),
 				param);
 
+            if(setCookies)
 			this.AppPreference.SetSharedKey("Cookies", response.Cookies);
 
 			if (response.Response == null)
@@ -346,9 +375,9 @@
 			return response.Response;
 		}
 
-		private async Task<InvokeForm.Response> SubmitFormAsync(LinearLayout resultLayout, FormMetadata formMetadata, List<FormInputManager> inputsManager)
+		private async Task<InvokeForm.Response> SubmitFormAsync(LinearLayout resultLayout, FormMetadata formMetadata, List<FormInputManager> inputsManager, bool validate = true)
 		{
-			var valid = this.ValidateForm(inputsManager);
+			var valid = !validate || this.ValidateForm(inputsManager);
 			if (valid)
 			{
 				resultLayout.RemoveAllViews();

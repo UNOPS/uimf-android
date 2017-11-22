@@ -10,7 +10,6 @@
 	using AndroidUiMetadateFramework.Core.Attributes;
 	using AndroidUiMetadateFramework.Core.Managers;
 	using AndroidUiMetadateFramework.Core.Models;
-	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Output;
@@ -33,19 +32,9 @@
 			this.OutputList = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
 			var label = new TextView(Application.Context) { Text = outputField.Label };
 			this.OutputList.AddView(label, this.OutputList.MatchParentWrapContent());
-
-			if (value.GetType() == typeof(JObject))
-			{
-				var jsonObj = (JObject)value;
-				this.ItemList = JsonConvert.DeserializeObject<IList<object>>(jsonObj.GetValue("results").ToString());
-				this.TotalCount = Convert.ToInt16(jsonObj.GetValue("totalCount").ToString());
-			}
-			else
-			{
-				var data = (PaginatedData<object>)value;
-				this.ItemList = data.Results.ToList();
-				this.TotalCount = data.TotalCount;
-			}
+		    var paginatedData = value.CastTObject<PaginatedData<object>>();
+		    this.ItemList = paginatedData.Results.ToList();
+		    this.TotalCount = paginatedData.TotalCount;
 
 			var listView = this.ItemList.IntializeListView(outputField, myFormHandler);
 
@@ -97,19 +86,12 @@
 					responsevalue = propertyInfo?.GetValue(response.Data, null);
 				}
 
-				// get listview current position - used to maintain scroll position
-				IList<object> newList;
-				if (responsevalue?.GetType() == typeof(JObject))
-				{
-					var jsonObj = (JObject)responsevalue;
-					newList = JsonConvert.DeserializeObject<IList<object>>(jsonObj.GetValue("results").ToString());
-				}
-				else
-				{
-					var data = (PaginatedData<object>)responsevalue;
-					newList = data?.Results.ToList();
-				}
-				if (newList != null && newList.Any())
+                // get listview current position - used to maintain scroll position
+
+			    var paginatedData = responsevalue.CastTObject<PaginatedData<object>>();
+			    var newList = paginatedData.Results.ToList();
+
+				if (newList.Any())
 				{
 					foreach (var item in newList)
 					{

@@ -44,12 +44,13 @@
 						if (myFormHandler.AllFormsMetadata != null)
 						{
 							var metadata = myFormHandler.AllFormsMetadata[tab.Form];
-							var fragment = new MyFormWrapper(metadata, myFormHandler, myFormHandler.Activity, tab.InputFieldValues);
-							if (myFormHandler.ContentResourceId.HasValue)
-							{
-								fragment.UpdateFragment(myFormHandler.ContentResourceId.Value);
-							}							
-						}
+							//var fragment = new MyFormWrapper(metadata, myFormHandler, myFormHandler.Activity, tab.InputFieldValues);
+							//if (myFormHandler.ContentResourceId.HasValue)
+							//{
+							//	fragment.UpdateFragment(myFormHandler.ContentResourceId.Value);
+							//}
+						    myFormHandler.FormWrapper.UpdateView(myFormHandler, metadata, tab.InputFieldValues);
+                        }
 						else
 						{
 							await myFormHandler.StartIFormAsync(tab.Form, tab.InputFieldValues);
