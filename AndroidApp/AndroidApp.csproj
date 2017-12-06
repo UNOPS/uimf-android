@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomFormWrapper.cs" />
+    <Compile Include="MenuItem.cs" />
     <Compile Include="MyActionBarDrawerToggle.cs" />
     <Compile Include="InstallmentList.cs" />
     <Compile Include="FormsActivity.cs" />

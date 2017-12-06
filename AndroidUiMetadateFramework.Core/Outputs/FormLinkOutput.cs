@@ -39,16 +39,8 @@
 
 			text.Click += async (sender, args) =>
 			{
-				if (myFormHandler.AllFormsMetadata != null)
-				{
-					var formMetadata = myFormHandler.AllFormsMetadata[btn.Form];
-					//myFormHandler.ReplaceFragment(formMetadata, btn.InputFieldValues);
-				    myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues);
-                }
-				else
-				{
-					await myFormHandler.StartIFormAsync(btn.Form, btn.InputFieldValues);
-				}
+				var formMetadata = myFormHandler.GetFormMetadata(btn.Form);
+			    myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues);
 
 			};
 			return text;

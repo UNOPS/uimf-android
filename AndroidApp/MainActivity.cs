@@ -13,11 +13,10 @@
 	using AndroidUiMetadateFramework.Core.Models;
 	using AndroidUiMetadateFramework.Core.Outputs;
 
-	[Activity(Label = "My Magic App", MainLauncher = false, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
-	public class MainActivity : AppCompatActivity, View.IOnClickListener
+	[Activity(Label = "GMS", MainLauncher = false, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
+	public class MainActivity : AppCompatActivity
 	{
 		public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
-		private Button Btn { get; set; }
 		private MyFormHandler MyFormHandler { get; set; }
 		private InputManagerCollection InputManager { get; set; }
 		private OutputManagerCollection OutputManager { get; set; }
@@ -28,22 +27,22 @@
         protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
-			this.SetContentView(Resource.Layout.Main);
 			this.RegisterManagers();
+            this.SetContentView(Resource.Layout.Main);
 			this.UiMetadataWebApi = new UiMetadataWebApi
 			{
-				FormMetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
-				MetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
-				RunFormUrl = "http://10.0.2.2:50072/api/form/run"
-			};
-			this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager, this.FormWrapper);
-			this.Btn = this.FindViewById<Button>(Resource.Id.button1);
-			this.Btn.SetOnClickListener(this);
+				FormMetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+				MetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+				RunFormUrl = "http://10.0.2.2:58337/api/form/run"
+            };
+		   // this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.main_content_frame);
+            this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager, this.FormWrapper);
 			var appPreference = new AppSharedPreference(Application.Context);
 			if (string.IsNullOrEmpty(appPreference.GetSharedKey("Cookies")))
 			{
-				var view = this.MyFormHandler.StartIFormAsync("login");
-			}				 
+			    var metadata = this.MyFormHandler.GetFormMetadata("login");
+			    this.FormWrapper.UpdateView(this.MyFormHandler, metadata);
+            }				 
 			else
 			{
 				Intent i = new Intent(this, typeof(FormsActivity));
@@ -63,9 +62,5 @@
 		    this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
         }
 
-		public void OnClick(View v)
-		{
-			throw new System.NotImplementedException();
-		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿namespace AndroidApp
 {
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Threading.Tasks;
 	using Android.App;
 	using Android.Content.Res;
@@ -21,7 +22,7 @@
 	using Newtonsoft.Json.Linq;
 	using UiMetadataFramework.Core;
 
-	[Activity(Label = "SPGS", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
+	[Activity(Label = "GMS", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
 	public class FormsActivity : AppCompatActivity, DrawerListAdapter.IOnItemClickListener
 	{
 		public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
@@ -30,9 +31,8 @@
 		private ActionBarDrawerToggle DrawerToggle { get; set; }
 		private MyFormHandler MyFormHandler { get; set; }
 		private InputManagerCollection InputManager { get; set; }
-		private List<object> MenuItems { get; set; }
+		private List<MenuItem> MenuItems { get; set; }
 		private OutputManagerCollection OutputManager { get; set; }
-		private List<string> MenuTitles { get; set; }
 		private UiMetadataWebApi UiMetadataWebApi { get; set; }
 		private Dictionary<string,FormMetadata> AllForms { get; set; }
 	    public EventHandlerManagerCollection EventManager { get; set; }
@@ -78,10 +78,10 @@
 			this.SetContentView(Resource.Layout.Magic);
 			this.UiMetadataWebApi = new UiMetadataWebApi
 			{
-				FormMetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
-				MetadataUrl = "http://10.0.2.2:50072/api/form/metadata",
-				RunFormUrl = "http://10.0.2.2:50072/api/form/run"
-			};
+				FormMetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+				MetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+				RunFormUrl = "http://10.0.2.2:58337/api/form/run"
+            };
 			this.RegisterManagers();			
 			this.GetAllFormsMetadata();
 		    this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.content_frame);
@@ -103,7 +103,7 @@
 			this.DrawerLayout.SetDrawerShadow(Resource.Drawable.drawer_shadow, GravityCompat.Start);
 			this.DrawerList.HasFixedSize = true;
 			this.DrawerList.SetLayoutManager(new LinearLayoutManager(this));
-			this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuTitles.ToArray(), this));
+			this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems.ToArray(), this));
 			this.DrawerList.SetBackgroundColor(Color.White);
 			this.SupportActionBar.Title = "My ActionBar";
 			this.SupportActionBar.SetDisplayHomeAsUpEnabled(true);
@@ -125,41 +125,40 @@
 				() => UiMetadataHttpRequestHelper.GetAllFormsMetadata(this.UiMetadataWebApi.MetadataUrl, appPreference.GetSharedKey("Cookies")));
 			var metadata = JsonConvert.DeserializeObject<MyForms>(result.Result);
 
-			this.MenuItems = new List<object>();
-			this.MenuTitles = new List<string>();
+			this.MenuItems = new List<MenuItem>();
 
-			foreach (var menuItem in metadata.Menus)
-			{
-				if (!string.IsNullOrEmpty(menuItem.Name))
-				{					
-					var existingForms = false;
-					foreach (var form in metadata.Forms)
-					{
-						if (form.CustomProperties != null)
-						{
-							var customeProperties = (JObject)form.CustomProperties;
-							var menuName = customeProperties.GetValue("menu").ToString();
-							if (menuName.Equals(menuItem.Name))
-							{
-								if (!existingForms)
-								{
-									this.MenuItems.Add(menuItem.Name);
-									this.MenuTitles.Add(menuItem.Name);
-								}
-								existingForms = true;
-								this.MenuItems.Add(form);
-								this.MenuTitles.Add("\t" + form.Label);								
-							}
-						}
-						if (!this.AllForms.ContainsKey(form.Id))
-						{
-							this.AllForms.Add(form.Id, form);
-						}
-						
-					}
-					
-				}
-			}
+		    foreach (var menuItem in metadata.Menus)
+		    {
+		        var existingForms = false;
+                foreach (var form in metadata.Forms)
+		        {
+		            if (form.CustomProperties != null && this.MenuItems.All(a => a.FormMetadata != form))
+		            {
+		                var customeProperties = (JObject)form.CustomProperties;
+		                var menuName = customeProperties.GetValue("menu").ToObject<string>();
+		                
+		                if (!string.IsNullOrEmpty(menuItem.Name))
+		                {
+		                    if (menuName != null && (menuName.Equals(menuItem.Name) || menuName == ""))
+		                    {
+		                        if (!existingForms && menuName != "")
+		                        {
+		                            this.MenuItems.Add(new MenuItem(menuItem.Name));
+		                        }
+		                        existingForms = true;
+		                        this.MenuItems.Add(new MenuItem("\t" + form.Label, form));
+		                    }
+
+		                }
+
+                    }
+		            if (!this.AllForms.ContainsKey(form.Id))
+		            {
+		                this.AllForms.Add(form.Id, form);
+		            }
+		        }
+
+		    }
 		}
 
 		protected override void OnPostCreate(Bundle savedInstanceState)
@@ -189,12 +188,11 @@
 
 	    private void SelectItem(int position)
 		{
-			if (this.MenuItems[position].GetType() == typeof(FormMetadata))
+			if (this.MenuItems[position].FormMetadata != null)
 			{
-                this.FormWrapper.UpdateView(this.MyFormHandler, (FormMetadata)this.MenuItems[position]);
-				//this.MyFormHandler.ReplaceFragment((FormMetadata)this.MenuItems[position]);
+                this.FormWrapper.UpdateView(this.MyFormHandler, this.MenuItems[position].FormMetadata);
 				// update selected item title, then close the drawer
-				this.Title = this.MenuTitles[position];
+				this.Title = this.MenuItems[position].Label;
 				this.DrawerLayout.CloseDrawer(this.DrawerList);
 			}
 		}

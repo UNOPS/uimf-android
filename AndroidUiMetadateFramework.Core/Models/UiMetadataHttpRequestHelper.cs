@@ -7,7 +7,6 @@
 	using System.Net;
 	using System.Net.Http;
 	using System.Text;
-	using System.Threading;
 	using System.Threading.Tasks;
 	using Newtonsoft.Json;
 	using UiMetadataFramework.Core;
@@ -21,23 +20,27 @@
 			var cookies = new CookieContainer();
 			var handler = new HttpClientHandler { CookieContainer = cookies };
 			var address = new Uri(url + "/" + formId);
-			var client = new HttpClient(handler)
-			{
-				BaseAddress = address
-			};
 
 			var cookiesList = !string.IsNullOrEmpty(requestCookies)
 				? JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(requestCookies)
 				: new List<KeyValuePair<string, string>>();
 
 			FillCookiesRequest(cookiesList, cookies, address);
-			var response = await client.GetAsync(address);
 
-			if (response.IsSuccessStatusCode)
-			{
-				var data = await ReadResponseContent(response);
-				formResponse = JsonConvert.DeserializeObject<FormMetadata>(data);
-			}
+		    using (var client = new HttpClient(handler))
+		    {
+		        client.Timeout = TimeSpan.FromSeconds(30);
+		        client.BaseAddress = address;
+
+		        var response = await client.GetAsync(address);
+
+		        if (response.IsSuccessStatusCode)
+		        {
+		            var data = await ReadResponseContent(response);
+		            formResponse = JsonConvert.DeserializeObject<FormMetadata>(data);
+                }
+		    }
+
 			return formResponse;
 		}
 
@@ -47,10 +50,6 @@
 			var cookies = new CookieContainer();
 			var handler = new HttpClientHandler { CookieContainer = cookies };
 			var address = new Uri(url);
-			var client = new HttpClient(handler)
-			{
-				BaseAddress = address
-			};
 
 			var cookiesList = !string.IsNullOrEmpty(requestCookies)
 				? JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(requestCookies)
@@ -60,16 +59,22 @@
 
 			var jsonReq = JsonConvert.SerializeObject(param);
 			var content = new StringContent(jsonReq, Encoding.UTF8, "application/json");
-			var response = await client.PostAsync(address, content);
-			if (response.IsSuccessStatusCode)
-			{
-				var data = await ReadResponseContent(response);
-				formResponse.Response = JsonConvert.DeserializeObject<List<InvokeForm.Response>>(data);
 
-				GetCookiesResponse(cookies, cookiesList, address);
-				formResponse.Cookies = JsonConvert.SerializeObject(cookiesList);
-			}
+		    using (var client = new HttpClient(handler))
+		    {
+		        client.Timeout = TimeSpan.FromSeconds(30);
+		        client.BaseAddress = address;
 
+		        var response = await client.PostAsync(address, content);
+		        if (response.IsSuccessStatusCode)
+		        {
+		            var data = await ReadResponseContent(response);
+		            formResponse.Response = JsonConvert.DeserializeObject<List<InvokeForm.Response>>(data);
+
+		            GetCookiesResponse(cookies, cookiesList, address);
+		            formResponse.Cookies = JsonConvert.SerializeObject(cookiesList);
+		        }
+            }         
 			return formResponse;
 		}
 

@@ -41,21 +41,9 @@
 					tv.SetPadding(10, 5, 10, 5);
 					tv.Click += async (sender, args) =>
 					{
-						if (myFormHandler.AllFormsMetadata != null)
-						{
-							var metadata = myFormHandler.AllFormsMetadata[tab.Form];
-							//var fragment = new MyFormWrapper(metadata, myFormHandler, myFormHandler.Activity, tab.InputFieldValues);
-							//if (myFormHandler.ContentResourceId.HasValue)
-							//{
-							//	fragment.UpdateFragment(myFormHandler.ContentResourceId.Value);
-							//}
-						    myFormHandler.FormWrapper.UpdateView(myFormHandler, metadata, tab.InputFieldValues);
-                        }
-						else
-						{
-							await myFormHandler.StartIFormAsync(tab.Form, tab.InputFieldValues);
-						}
+						var metadata = myFormHandler.GetFormMetadata(tab.Form);
 
+						 myFormHandler.FormWrapper.UpdateView(myFormHandler, metadata, tab.InputFieldValues);
 					};
 					linearL.AddView(tv);
 				}

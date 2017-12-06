@@ -124,34 +124,35 @@
 
 		public View GetIForm(string form, IDictionary<string, object> inputFieldValues = null)
 		{
-			FormMetadata formMetadata;
-			if (this.AllFormsMetadata != null)
-			{
-				formMetadata = this.AllFormsMetadata[form];
-			}
-			else if (this.UiMetadataWebApi != null)
-			{
-				formMetadata = this.GetFormMetadataAsync(form).Result;
-			}
-			else
-			{
-				formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
-			}
+			FormMetadata formMetadata = this.GetFormMetadata(form);
 			var layout = this.GetIForm(formMetadata, inputFieldValues);
 			return layout;
 		}
 
-		public async Task<View> GetIFormAsync(string form, IDictionary<string, object> inputFieldValues = null)
+	    public FormMetadata GetFormMetadata(string form)
+	    {
+	        FormMetadata formMetadata;
+	        if (this.AllFormsMetadata != null && this.AllFormsMetadata.ContainsKey(form))
+	        {
+	            formMetadata = this.AllFormsMetadata[form];
+	        }
+	        else if (this.UiMetadataWebApi != null)
+	        {
+	            var result = Task.Run(
+	                () => this.GetFormMetadataAsync(form));
+	            formMetadata = result.Result;
+	        }
+	        else
+	        {
+	            formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
+	        }
+
+	        return formMetadata;
+	    }
+
+	    public async Task<View> GetIFormAsync(string form, IDictionary<string, object> inputFieldValues = null)
 		{
-			FormMetadata formMetadata;
-			if (this.UiMetadataWebApi != null)
-			{
-				formMetadata = await this.GetFormMetadataAsync(form);
-			}
-			else
-			{
-				formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
-			}
+			FormMetadata formMetadata = this.GetFormMetadata(form);
 			var formParameters = new FormParameters(formMetadata, inputFieldValues);
 			var layout = this.DrawForm(formParameters);
 			return layout;
@@ -200,34 +201,11 @@
 			}
 		}
 
-		//public void ReplaceFragment(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null)
-		//{
-		//	var fragment = new MyFormWrapper(formMetadata, this, this.Activity, inputFieldValues);
-		//	this.AppFragments?.Add(fragment);
-		//	if (this.ContentResourceId.HasValue)
-		//	{
-		//		fragment.UpdateFragment(this.ContentResourceId.Value);
-		//	}
-		//}
-
 		public async Task<View> StartIFormAsync(string form, IDictionary<string, object> inputFieldValues = null)
 		{
 			try
 			{
-				FormMetadata formMetadata;
-				if (this.AllFormsMetadata != null)
-				{
-					formMetadata = this.AllFormsMetadata[form];
-				}
-				else if (this.UiMetadataWebApi != null)
-				{
-					formMetadata = await this.GetFormMetadataAsync(form);
-				}
-				else
-				{
-					formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
-				}
-
+				FormMetadata formMetadata = this.GetFormMetadata(form);
 				var formParameters = new FormParameters(formMetadata, inputFieldValues);
 				var layout = this.DrawForm(formParameters);
 				return layout;
@@ -297,22 +275,14 @@
 
 		private void DrawOutput(LinearLayout layout, InvokeForm.Response result, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
-			if (result != null)
+			if (result?.Data != null)
 			{
 				var reloadResponse = result.Data.CastTObject<ReloadResponse>();
 				if (reloadResponse?.Form != null)
 				{
-					if (this.AllFormsMetadata != null)
-					{
-						var metadata = this.AllFormsMetadata[reloadResponse.Form];
-					    this.FormWrapper.UpdateView(this,metadata, reloadResponse.InputFieldValues);
+					var metadata = this.GetFormMetadata(reloadResponse.Form);
+					this.FormWrapper.UpdateView(this,metadata, reloadResponse.InputFieldValues);
 
-                        //this.ReplaceFragment(metadata, reloadResponse.InputFieldValues);
-					}
-					else
-					{
-						this.StartIFormAsync(reloadResponse.Form, reloadResponse.InputFieldValues);
-					}
 					return;
 				}
 				var orderedOutputs = formMetadata.OutputFields.OrderBy(a => a.OrderIndex).ToList();

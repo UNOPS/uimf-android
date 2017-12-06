@@ -114,11 +114,15 @@
 	    {
 	        if (customProperties.Source is string)
 	        {
-	            var dataSource = customProperties.Source.ToString();
+	            var list = new Dictionary<string, object> { { "query", "" } };
+	            var obj = JsonConvert.SerializeObject(list);
+
+                var dataSource = customProperties.Source.ToString();
 	            var request = new InvokeForm.Request
 	            {
-	                Form = dataSource
-	            };
+	                Form = dataSource,
+	                InputFieldValues = obj
+                };
 	            var result = Task.Run(
 	                () => myFormHandler.InvokeFormAsync(new[] { request }, false));
 
