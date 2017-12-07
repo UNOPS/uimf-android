@@ -127,6 +127,7 @@
     <Compile Include="Inputs\DropdownInput.cs" />
     <Compile Include="Inputs\TextInput.cs" />
     <Compile Include="Models\HttpResponse.cs" />
+    <Compile Include="Models\TypeaheadRequest.cs" />
     <Compile Include="Models\TypeaheadResponse.cs" />
     <Compile Include="Models\UiMetadataHttpRequestHelper.cs" />
     <Compile Include="Models\ListViewHolder.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Managers\InputManagerCollection.cs" />
     <Compile Include="Inputs\DateTimeInput.cs" />
     <Compile Include="Inputs\NumericInput.cs" />
+    <Compile Include="Models\ValueList.cs" />
     <Compile Include="Outputs\PaginationOutput.cs" />
     <Compile Include="Outputs\ActionListOutput.cs" />
     <Compile Include="Outputs\ListOutput.cs" />
