@@ -1,7 +1,7 @@
 ﻿namespace AndroidUiMetadateFramework.Core.Models
 {
     using System.Collections.Generic;
-    using UiMetadataFramework.Basic.Input.Typeahead;
+	using UiMetadataFramework.Basic.Input.Typeahead;
     using UiMetadataFramework.Core;
 
     public class TypeaheadResponse<T> : FormResponse

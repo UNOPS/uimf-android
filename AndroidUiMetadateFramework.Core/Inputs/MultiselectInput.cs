@@ -20,13 +20,17 @@
         {
             this.ItemsList = new List<TypeaheadItem<object>>();
             var properties = inputCustomProperties.CastTObject<TypeaheadCustomProperties>();
-            var source = properties.GetTypeaheadSource(myFormHandler);
+
+
+			var source = properties.GetTypeaheadSource(myFormHandler);
+
             foreach (var item in source)
             {
                 this.ItemsList.Add(item.CastTObject<TypeaheadItem<object>>());
             }
+
             ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context,
-                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToArray());
+                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToList<string>());
 
             this.InputText = new MultiAutoCompleteTextView(Application.Context)
             {
@@ -34,18 +38,30 @@
                 Threshold = 0
             };
 
+
+			this.InputText.TextChanged += async (sender, args) =>
+			{
+				adapter.Clear();
+				var query = args.Text.ToString().Split(',').Last().Trim();
+
+				this.ItemsList = properties.GetTypeaheadSource(myFormHandler, new TypeaheadRequest<string> { Query = query }).Select(t => t.CastTObject<TypeaheadItem<object>>()).ToList();
+				var data = this.ItemsList.Select(t=>t.Label).ToList<string>();
+
+				adapter.AddAll(data);
+			};
+
             this.InputText.SetTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
             return this.InputText;
         }
 
         public object GetValue()
         {
-            var items = this.InputText.Text.Split(',');
-            var selectedItems = this.ItemsList.Where(a => items.Contains(a.Label)).Select(a => a.Value);
+            var items = this.InputText.Text.Split(',').Select(t=>t.Trim());
+            var selectedItems = this.ItemsList.Where(a => items.Contains(a.Label)).Select(a => a.Value).ToList();
 
             return new MultiSelect<object>
             {
-                Items = selectedItems.ToList()
+                Items = selectedItems
             };
         }
 

@@ -28,14 +28,28 @@
             }
 
             ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context,
-                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToArray());
+                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToList<string>());
 
             this.InputText = new AutoCompleteTextView(Application.Context)
             {
                 Adapter = adapter,
                 Threshold = 0
             };
-            return this.InputText;
+
+
+			this.InputText.TextChanged += async (sender, args) =>
+			{
+				adapter.Clear();
+				var query = args.Text.ToString().Trim();
+
+				this.ItemsList = properties.GetTypeaheadSource(myFormHandler, new TypeaheadRequest<string> { Query = query }).Select(t => t.CastTObject<TypeaheadItem<object>>()).ToList();
+				var data = this.ItemsList.Select(t => t.Label).ToList<string>();
+
+				adapter.AddAll(data);
+			};
+
+
+			return this.InputText;
         }
 
         public object GetValue()

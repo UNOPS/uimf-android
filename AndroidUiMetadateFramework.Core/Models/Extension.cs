@@ -110,35 +110,40 @@
 			listView.Adapter = adapter;
 		}
 
-	    public static IEnumerable<object> GetTypeaheadSource(this TypeaheadCustomProperties customProperties, MyFormHandler myFormHandler)
-	    {
-	        if (customProperties.Source is string)
-	        {
-	            var list = new Dictionary<string, object> { { "query", "" } };
-	            var obj = JsonConvert.SerializeObject(list);
+		public static IEnumerable<object> GetTypeaheadSource(this TypeaheadCustomProperties customProperties,
+			MyFormHandler myFormHandler,
+			TypeaheadRequest<string> request = null)
+		{
+			if (customProperties.Source is IEnumerable<object>)
+			{
+				return customProperties.Source.CastTObject<IEnumerable<object>>();
+			}
+			if (request != null)
+			{
+				var list = new Dictionary<string, object> { { "query", request.Query }, { "ids", request.Ids } };
+				var obj = JsonConvert.SerializeObject(list);
 
-                var dataSource = customProperties.Source.ToString();
-	            var request = new InvokeForm.Request
-	            {
-	                Form = dataSource,
-	                InputFieldValues = obj
-                };
-	            var result = Task.Run(
-	                () => myFormHandler.InvokeFormAsync(new[] { request }, false));
+				var dataSource = customProperties.Source.ToString();
+				var formRequest = new InvokeForm.Request
+				{
+					Form = dataSource,
+					InputFieldValues = obj
+				};
 
-	            var response = result.Result;
-	            var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
-	            if (typeahead != null)
-	            {
-	                return typeahead.Items;
-                }
-	        }
-	        else
-	        {
-	            return (IEnumerable<object>)customProperties.Source;
+				var result = Task.Run(
+					() => myFormHandler.InvokeFormAsync(new[] { formRequest }, false));
 
-	        }
-	        return new List<object>();
-	    }
-    }
+				var response = result.Result;
+
+				var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
+
+				if (typeahead != null)
+				{
+					return typeahead.Items;
+				}
+			}
+
+			return new List<object>();
+		}
+	}
 }

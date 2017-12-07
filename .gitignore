@@ -6,3 +6,5 @@ App.Core/bin/
 AndroidUiMetadateFramework.Core/bin/
 AndroidUiMetadateFramework.Core/obj/
 .vs/
+
+AndroidApp/Resources/Resource\.Designer\.cs
