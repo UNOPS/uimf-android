@@ -103,7 +103,7 @@
 			this.DrawerLayout.SetDrawerShadow(Resource.Drawable.drawer_shadow, GravityCompat.Start);
 			this.DrawerList.HasFixedSize = true;
 			this.DrawerList.SetLayoutManager(new LinearLayoutManager(this));
-			this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems.ToArray(), this));
+			this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
 			this.DrawerList.SetBackgroundColor(Color.White);
 			this.SupportActionBar.Title = "My ActionBar";
 			this.SupportActionBar.SetDisplayHomeAsUpEnabled(true);
@@ -196,5 +196,18 @@
 				this.DrawerLayout.CloseDrawer(this.DrawerList);
 			}
 		}
+
+	    public Dictionary<string, FormMetadata> Reload()
+	    {
+	        this.GetAllFormsMetadata();
+	        this.MyFormHandler.AllFormsMetadata = new Dictionary<string, FormMetadata>();
+	        foreach (var item in this.AllForms)
+	        {
+	            this.MyFormHandler.AllFormsMetadata.Add(item.Key, item.Value);
+            }
+	        this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
+            this.DrawerList.GetAdapter().NotifyDataSetChanged();
+	        return this.AllForms;
+	    }
 	}
 }

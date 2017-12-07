@@ -1,21 +1,21 @@
 ﻿namespace AndroidApp
 {
-	using Android.Graphics;
+    using System.Collections.Generic;
+    using Android.Graphics;
 	using Android.Support.V7.Widget;
 	using Android.Views;
 	using Android.Widget;
-	using Java.Lang;
 
     public class DrawerListAdapter : RecyclerView.Adapter
 	{
-		public DrawerListAdapter(MenuItem[] myDataSet, IOnItemClickListener listener)
+		public DrawerListAdapter(IList<MenuItem> myDataSet, IOnItemClickListener listener)
 		{
 			this.Dataset = myDataSet;
 			this.Listener = listener;
 		}
 
-		public override int ItemCount => this.Dataset.Length;
-		private MenuItem[] Dataset { get; }
+		public override int ItemCount => this.Dataset.Count;
+		private IList<MenuItem> Dataset { get; }
 		private IOnItemClickListener Listener { get; }
 
 		public override void OnBindViewHolder(RecyclerView.ViewHolder holderRaw, int position)

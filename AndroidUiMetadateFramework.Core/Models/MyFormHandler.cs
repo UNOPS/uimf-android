@@ -280,10 +280,9 @@
 				var reloadResponse = result.Data.CastTObject<ReloadResponse>();
 				if (reloadResponse?.Form != null)
 				{
-					var metadata = this.GetFormMetadata(reloadResponse.Form);
-					this.FormWrapper.UpdateView(this,metadata, reloadResponse.InputFieldValues);
+				    this.FormWrapper.ReloadView(this, reloadResponse);
 
-					return;
+                    return;
 				}
 				var orderedOutputs = formMetadata.OutputFields.OrderBy(a => a.OrderIndex).ToList();
 				foreach (var output in orderedOutputs)

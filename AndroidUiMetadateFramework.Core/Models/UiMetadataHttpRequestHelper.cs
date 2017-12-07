@@ -6,7 +6,9 @@
 	using System.Linq;
 	using System.Net;
 	using System.Net.Http;
+	using System.Net.Http.Headers;
 	using System.Text;
+	using System.Text.RegularExpressions;
 	using System.Threading.Tasks;
 	using Newtonsoft.Json;
 	using UiMetadataFramework.Core;
@@ -70,9 +72,8 @@
 		        {
 		            var data = await ReadResponseContent(response);
 		            formResponse.Response = JsonConvert.DeserializeObject<List<InvokeForm.Response>>(data);
-
-		            GetCookiesResponse(cookies, cookiesList, address);
-		            formResponse.Cookies = JsonConvert.SerializeObject(cookiesList);
+		            var newCookies = GetCookiesResponse(handler.CookieContainer, address, response.Headers);                                   
+		            formResponse.Cookies = JsonConvert.SerializeObject(newCookies);
 		        }
             }         
 			return formResponse;
@@ -115,13 +116,34 @@
 			}
 		}
 
-		private static void GetCookiesResponse(CookieContainer cookieContainer, List<KeyValuePair<string, string>> toCookiesList, Uri address)
+		private static List<KeyValuePair<string, string>> GetCookiesResponse(CookieContainer cookieContainer, Uri address, HttpHeaders responseHeaders)
 		{
-			IEnumerable<Cookie> responseCookies = cookieContainer.GetCookies(address).Cast<Cookie>();
-			foreach (Cookie cookie in responseCookies)
-			{
-				toCookiesList.Add(new KeyValuePair<string, string>(cookie.Name, cookie.Value));
-			}
+		    var cookies = new List<KeyValuePair<string, string>>();
+		    IEnumerable<string> rawCookies;
+            var isCookieHeader = responseHeaders.TryGetValues("Set-Cookie", out rawCookies);
+
+            if (isCookieHeader)
+		    {
+		        foreach (var rawCookie in rawCookies.ToList())
+		        {
+		            var cookie= rawCookie.Split(';')[0];
+		            var cookieValues = cookie.Split('=');
+		            if (cookieValues.Length > 1 && !string.IsNullOrEmpty(cookieValues[1]))
+		            {
+		                cookies.Add(new KeyValuePair<string, string>(cookieValues[0], cookieValues[1]));
+                    }		           
+		        }
+		    }
+		    else
+		    {
+		        var responseCookies = cookieContainer.GetCookies(address).Cast<Cookie>();
+		        foreach (Cookie cookie in responseCookies)
+		        {
+		            cookies.Add(new KeyValuePair<string, string>(cookie.Name, cookie.Value));
+		        }
+            }
+            
+            return cookies;
 		}
 
 		private static async Task<string> ReadResponseContent(HttpResponseMessage response)
