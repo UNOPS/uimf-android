@@ -8,11 +8,12 @@
 	using Android.Support.V7.App;
 	using Android.Views;
 	using Android.Widget;
-	using AndroidUiMetadateFramework.Core.EventHandlers;
-	using AndroidUiMetadateFramework.Core.Inputs;
-	using AndroidUiMetadateFramework.Core.Managers;
-	using AndroidUiMetadateFramework.Core.Models;
-	using AndroidUiMetadateFramework.Core.Outputs;
+	using AndroidApp.Forms;
+	using AndroidUiMetadataFramework.Core.EventHandlers;
+	using AndroidUiMetadataFramework.Core.Inputs;
+	using AndroidUiMetadataFramework.Core.Managers;
+	using AndroidUiMetadataFramework.Core.Models;
+	using AndroidUiMetadataFramework.Core.Outputs;
 	using App.Core;
 	using MediatR;
 	using StructureMap;
@@ -117,7 +118,6 @@
 
 			this.OutputManager = new OutputManagerCollection();
 			this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
-			this.OutputManager.RegisterAssembly(typeof(InstallmentList).Assembly);
 
 		    this.EventManager = new EventHandlerManagerCollection();
             this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);

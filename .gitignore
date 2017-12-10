@@ -8,3 +8,5 @@ AndroidUiMetadateFramework.Core/obj/
 .vs/
 
 AndroidApp/Resources/Resource\.Designer\.cs
+AndroidUiMetadataFramework.Core/obj/
+AndroidUiMetadataFramework.Core/bin/
