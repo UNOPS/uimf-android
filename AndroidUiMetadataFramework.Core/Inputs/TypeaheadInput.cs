@@ -20,7 +20,6 @@
         {
             this.ItemsList = new List<TypeaheadItem<object>>();
             var customeSource = inputCustomProperties.GetCustomProperty<object>("source");
-            //var properties = inputCustomProperties.CastTObject<TypeaheadCustomProperties>();
             var source = customeSource.GetTypeaheadSource(myFormHandler);           
 
             foreach (var item in source)
@@ -28,13 +27,25 @@
                 this.ItemsList.Add(item.CastTObject<TypeaheadItem<object>>());
             }
 
-            ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context,
-                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToArray());
+            var adapter = new ArrayAdapter<string>(Application.Context,
+                Android.Resource.Layout.SimpleDropDownItem1Line, this.ItemsList.Select(a => a.Label).ToList());
 
             this.InputText = new AutoCompleteTextView(Application.Context)
             {
                 Adapter = adapter,
                 Threshold = 0
+            };
+
+            this.InputText.TextChanged += async (sender, args) =>
+            {
+                adapter.Clear();
+                var query = args.Text.ToString().Trim();
+                this.ItemsList = customeSource.GetTypeaheadSource(myFormHandler, new TypeaheadRequest<string> { Query = query })
+                .Select(t => t.CastTObject<TypeaheadItem<object>>()).ToList();
+                var data = this.ItemsList.Select(t => t.Label).ToList();
+
+                adapter.AddAll(data);
+
             };
             return this.InputText;
         }

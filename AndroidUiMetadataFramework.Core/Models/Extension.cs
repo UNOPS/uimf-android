@@ -67,33 +67,39 @@
             return totalHeight;
         }
 
-        public static IEnumerable<object> GetTypeaheadSource(this object source, MyFormHandler myFormHandler)
+        public static IEnumerable<object> GetTypeaheadSource(this object source,
+            MyFormHandler myFormHandler,
+            TypeaheadRequest<string> request = null)
         {
-            if (source is string)
+            if (source is IEnumerable<object>)
             {
-                var list = new Dictionary<string, object> { { "query", "" } };
+                return source.CastTObject<IEnumerable<object>>();
+            }
+            if (request != null)
+            {
+                var list = new Dictionary<string, object> { { "query", request.Query }, { "ids", request.Ids } };
                 var obj = JsonConvert.SerializeObject(list);
 
                 var dataSource = source.ToString();
-                var request = new InvokeForm.Request
+                var formRequest = new InvokeForm.Request
                 {
                     Form = dataSource,
                     InputFieldValues = obj
                 };
+
                 var result = Task.Run(
-                    () => myFormHandler.InvokeFormAsync(new[] { request }, false));
+                    () => myFormHandler.InvokeFormAsync(new[] { formRequest }, false));
 
                 var response = result.Result;
+
                 var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
+
                 if (typeahead != null)
                 {
                     return typeahead.Items;
                 }
             }
-            else
-            {
-                return (IEnumerable<object>)source;
-            }
+
             return new List<object>();
         }
 
