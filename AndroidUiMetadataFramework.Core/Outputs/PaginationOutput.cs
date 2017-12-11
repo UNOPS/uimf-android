@@ -49,6 +49,14 @@
 
 			var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, listView.GetListHeigth());
 			this.OutputList.AddView(listView, param);
+		    if (this.ItemList.Count == 0)
+		    {
+		        var noResult = new TextView(Application.Context)
+		        {
+		            Text = "no data."
+		        };
+		        this.OutputList.AddView(noResult, this.OutputList.MatchParentWrapContent());
+            }
 			return this.OutputList;
 		}
 
@@ -73,11 +81,6 @@
 					PageIndex = this.PageIndex
 				});
 				var response = await myFormHandler.HandleFormAsync(formMetadata, inputsManager);
-			    if (response == null)
-			    {
-			      Toast.MakeText(Application.Context, "Error fetching data. Server returned status code: {0}", ToastLength.Long).Show();
-			      return;
-                }
 				object responsevalue;
 				if (response.Data.GetType() == typeof(JObject))
 				{

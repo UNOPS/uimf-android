@@ -1,7 +1,6 @@
 ﻿namespace AndroidApp.Forms.Outputs
 {
     using System.Collections.Generic;
-    using System.Linq;
     using Android.App;
     using Android.Views;
     using Android.Widget;
@@ -27,7 +26,7 @@
             var formInstance = value.CastTObject<FormInstanceModel>();
             foreach (var formInstanceValue in formInstance.Values)
             {
-                var textView = new TextView(Application.Context) { Text = formInstanceValue.Label +": "+ formInstanceValue.Value};
+                var textView = new TextView(Application.Context) { Text = formInstanceValue.Label + ": " + formInstanceValue.Value };
                 this.OutputView.AddView(textView, this.OutputView.MatchParentWrapContent());
             }
             return this.OutputView;
@@ -39,7 +38,6 @@
         public string Label { get; set; }
         public string Value { get; set; }
     }
-
 
     public class FormInstanceModel
     {

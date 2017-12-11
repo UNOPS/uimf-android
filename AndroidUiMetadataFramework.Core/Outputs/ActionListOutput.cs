@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using Android.App;
-    using Android.Graphics;
     using Android.Views;
     using Android.Widget;
     using AndroidUiMetadataFramework.Core.Attributes;
@@ -47,7 +46,7 @@
             button.Click += async (sender, args) =>
             {
                 var formMetadata = myFormHandler.GetFormMetadata(btn.Form);
-                var action = btn.Action?? FormLinkActions.OpenModal;
+                var action = btn.Action ?? FormLinkActions.OpenModal;
                 myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues, action);
             };
             return button;

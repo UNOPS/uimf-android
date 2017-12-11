@@ -47,7 +47,7 @@
 
         public void SetValue(object value)
         {
-            Paginator paginator = value.CastTObject<Paginator>();
+            var paginator = value.CastTObject<Paginator>();
 
             this.Ascending.Text = paginator.Ascending?.ToString();
             this.OrderBy.Text = paginator.OrderBy;

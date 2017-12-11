@@ -24,7 +24,7 @@
             if (obj.GetType() == typeof(JValue))
             {
                 var jValue = (JValue)obj;
-                return jValue.HasValues ? ((JValue)obj).ToObject<T>() : default(T);
+                return jValue.Value != null ? ((JValue)obj).ToObject<T>() : default(T);
             }
             if (obj.GetType() == typeof(JArray))
             {

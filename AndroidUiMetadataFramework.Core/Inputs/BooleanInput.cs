@@ -26,7 +26,8 @@
 
 		public void SetValue(object value)
 		{
-			this.InputBoolean.Checked = value.CastTObject<bool>();
+            var isChecked = value.CastTObject<bool>();
+            this.InputBoolean.Checked = isChecked;
 		}
 	}
 }

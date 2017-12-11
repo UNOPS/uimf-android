@@ -22,9 +22,11 @@
 		public override void OnBindViewHolder(RecyclerView.ViewHolder holderRaw, int position)
 		{
 			var holder = (ViewHolder)holderRaw;
-		    holder.TextView.Text = this.Dataset[position].Label;
-		    
-            holder.TextView.Click += (sender, args) => { this.Listener.OnClick((View)sender, position); };
+		    holder.TextView.Text = this.Dataset[position].Label;		    
+            holder.TextView.Click += (sender, args) =>
+            {
+                this.Listener.OnClick((View)sender, position);
+            };
 		}
 
 		public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -39,11 +41,9 @@
 
 	    public override int GetItemViewType(int position)
 	    {
-	        //your code 
 	        return position;
 	    }
 
-        //Associated Objects
         public interface IOnItemClickListener
 		{
 			void OnClick(View view, int position);

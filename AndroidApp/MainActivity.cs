@@ -45,7 +45,7 @@
             }
             else
             {
-                Intent i = new Intent(this, typeof(FormsActivity));
+                var i = new Intent(this, typeof(FormsActivity));
                 this.StartActivity(i);
             }
         }

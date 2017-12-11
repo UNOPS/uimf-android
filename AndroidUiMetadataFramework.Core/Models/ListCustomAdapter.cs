@@ -15,13 +15,11 @@
             this.ObjectList = objectList;
             this.OutputFieldProperty = outputFieldProperty;
             this.MyFormHandler = myFormHandler;
-            this.AllFormsMetadata = myFormHandler.AllFormsMetadata;
         }
 
         public override int Count => this.ObjectList.Count;
 
         public override T this[int position] => this.ObjectList[position];
-        private Dictionary<string, FormMetadata> AllFormsMetadata { get; }
         private MyFormHandler MyFormHandler { get; }
 
         private List<T> ObjectList { get; }
@@ -37,22 +35,11 @@
             PropertyInfo[] properties = null;
             var view = (ViewGroup)convertView;
             var viewHolder = new ListViewHolder { Objects = new List<View>() };
-            //var type = this.ObjectList[position].GetType();
-
-            //properties = this.ObjectList[position].GetType().GetProperties();
 
             if (view == null)
             {
                 view = new LinearLayout(parent.Context) { Orientation = Orientation.Vertical };
                 var param = view.MatchParentWrapContent();
-
-                //foreach (var unused in properties)
-                //{
-                //	var textView = new TextView(parent.Context);
-                //	view.AddView(textView, param);
-                //	view.SetPadding(0, 10, 0, 10);
-                //	viewHolder.Objects.Add(textView);
-                //}
 
                 var orderedOutputs = this.OutputFieldProperty.OrderBy(a => a.OrderIndex);
 
@@ -82,29 +69,9 @@
                     }
                 }
 
-                //else
-                //{
-                //	var textView = new TextView(parent.Context);
-                //	view.AddView(textView, param);
-                //	view.SetPadding(0, 10, 0, 10);
-                //	viewHolder.Objects.Add(textView);
-                //}
-
                 view.LayoutParameters = param;
                 view.Tag = viewHolder;
             }
-
-            //var holder = (ListViewHolder) view.Tag;
-
-            //for (var i = 0; i < properties.Length; i++)
-            //	{
-            //		var property = properties[i];
-            //	//	holder.Objects[i].Text = property.Name + ": " + property.GetValue(this.ObjectList[position], null);
-            //	}
-            //else
-            //{
-            //	holder.Objects[0].Text = this.ObjectList[position]?.ToString();
-            //}
 
             return view;
         }

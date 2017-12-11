@@ -1,6 +1,5 @@
 ﻿namespace AndroidUiMetadataFramework.Core.Managers
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using AndroidUiMetadataFramework.Core.Models;
@@ -17,10 +16,13 @@
         {
         }
 
-        public static void OnResponseHandledEvent(MyFormHandler myFormHandler,FormMetadata formMetadata, List<FormInputManager> inputsManager, InvokeForm.Response result)
+        public static void OnResponseHandledEvent(MyFormHandler myFormHandler,
+            FormMetadata formMetadata,
+            List<FormInputManager> inputsManager,
+            InvokeForm.Response result)
         {
-           var inputsWithEvent = inputsManager.Where(a => a.Input.EventHandlers.Any(e => e.RunAt.Equals(FormEvents.ResponseHandled))).ToList();
-           //var formEvent = formMetadata.EventHandlers.Where(e => e.RunAt.Equals(FormEvents.ResponseHandled)).ToList();
+            var inputsWithEvent = inputsManager.Where(a => a.Input.EventHandlers.Any(e => e.RunAt.Equals(FormEvents.ResponseHandled))).ToList();
+            //var formEvent = formMetadata.EventHandlers.Where(e => e.RunAt.Equals(FormEvents.ResponseHandled)).ToList();
 
             foreach (var input in inputsWithEvent)
             {
@@ -30,7 +32,6 @@
                     var manager = myFormHandler.EventHandlerManager.GetManager(inputEvent.Id);
                     manager.HandleEvent(inputEvent.CustomProperties, input, result);
                 }
-               
             }
         }
 

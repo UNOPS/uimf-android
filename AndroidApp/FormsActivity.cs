@@ -1,6 +1,5 @@
 ﻿namespace AndroidApp
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -141,7 +140,7 @@
                 var orderedForms = metadata.Forms
                     .OrderBy(a => a.CustomProperties != null ? a.CustomProperties?.GetCustomProperty<long>("menuOrderIndex") : 0);
                 foreach (var menuItem in orderedMenu)
-                {                   
+                {
                     var existingForms = false;
                     foreach (var form in orderedForms)
                     {
@@ -168,7 +167,7 @@
                     }
                 }
             }
-            catch (Java.Lang.Exception ex)
+            catch (Exception)
             {
                 Toast.MakeText(Application.Context, "Server is not available in this moment", ToastLength.Long).Show();
             }
@@ -185,7 +184,6 @@
             this.DrawerList.SetLayoutManager(new LinearLayoutManager(this));
             this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
             this.DrawerList.SetBackgroundColor(Color.White);
-            this.SupportActionBar.Title = "My ActionBar";
             this.SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             this.SupportActionBar.SetHomeButtonEnabled(true);
 

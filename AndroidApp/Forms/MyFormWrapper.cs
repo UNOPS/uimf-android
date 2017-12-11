@@ -46,23 +46,26 @@
 
         public void UpdateFragment(int resId)
         {
-            try
+            if (this.MyFormHandler != null)
             {
-                var form = this.MyFormHandler.GetIForm(this.FormMetadata, this.InputFieldValues, this.SubmitAction);
-                if (form != null)
+                try
                 {
-                    this.RootView = form;
+                    var form = this.MyFormHandler.GetIForm(this.FormMetadata, this.InputFieldValues, this.SubmitAction);
+                    if (form != null)
+                    {
+                        this.RootView = form;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
+                    Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
                     return;
                 }
-            }
-            catch (Exception ex)
-            {
-                Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
-                return;
-            }
+            }            
            
             var fragmentManager = this.OwnerActivity.FragmentManager;
             var ft = fragmentManager.BeginTransaction();

@@ -27,7 +27,7 @@
 		        Label = "",
 		        Value = ""
 		    });
-            ArrayAdapter<string> adapter = new ArrayAdapter<string>(Application.Context, Android.Resource.Layout.SimpleSpinnerItem, this.Items.Select(a => a.Label).ToArray());
+            var adapter = new ArrayAdapter<string>(Application.Context, Android.Resource.Layout.SimpleSpinnerItem, this.Items.Select(a => a.Label).ToArray());
 			this.Spinner.Adapter = adapter;
 			return this.Spinner;
 		}
