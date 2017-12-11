@@ -1,5 +1,6 @@
 ﻿namespace AndroidApp
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -12,6 +13,7 @@
     using Android.Support.V7.App;
     using Android.Support.V7.Widget;
     using Android.Views;
+    using Android.Widget;
     using AndroidApp.Forms;
     using AndroidApp.Forms.Inputs;
     using AndroidApp.Forms.Menu;
@@ -129,38 +131,46 @@
         {
             this.AllForms = new Dictionary<string, FormMetadata>();
             var appPreference = new AppSharedPreference(Application.Context);
-            var result = Task.Run(
-                () => UiMetadataHttpRequestHelper.GetAllFormsMetadata(this.UiMetadataWebApi.MetadataUrl, appPreference.GetSharedKey("Cookies")));
-            var metadata = JsonConvert.DeserializeObject<MyForms>(result.Result);
-
             this.MenuItems = new List<MenuItem>();
-
-            foreach (var menuItem in metadata.Menus)
+            try
             {
-                var existingForms = false;
-                foreach (var form in metadata.Forms)
-                {
-                    if (form.CustomProperties != null && this.MenuItems.All(a => a.FormMetadata != form))
+                var result = Task.Run(
+                    () => UiMetadataHttpRequestHelper.GetAllFormsMetadata(this.UiMetadataWebApi.MetadataUrl, appPreference.GetSharedKey("Cookies")));
+                var metadata = JsonConvert.DeserializeObject<MyForms>(result.Result);
+                var orderedMenu = metadata.Menus.OrderBy(a => a.OrderIndex);
+                var orderedForms = metadata.Forms
+                    .OrderBy(a => a.CustomProperties != null ? a.CustomProperties?.GetCustomProperty<long>("menuOrderIndex") : 0);
+                foreach (var menuItem in orderedMenu)
+                {                   
+                    var existingForms = false;
+                    foreach (var form in orderedForms)
                     {
-                        var menuName = form.CustomProperties.GetCustomProperty<string>("menu");
-                        if (!string.IsNullOrEmpty(menuItem.Name))
+                        if (form.CustomProperties != null && this.MenuItems.All(a => a.FormMetadata != form))
                         {
-                            if (menuName != null && (menuName.Equals(menuItem.Name) || menuName == ""))
+                            var menuName = form.CustomProperties.GetCustomProperty<string>("menu");
+                            if (!string.IsNullOrEmpty(menuItem.Name))
                             {
-                                if (!existingForms && menuName != "")
+                                if (menuName != null && (menuName.Equals(menuItem.Name) || menuName == ""))
                                 {
-                                    this.MenuItems.Add(new MenuItem(menuItem.Name));
+                                    if (!existingForms && menuName != "")
+                                    {
+                                        this.MenuItems.Add(new MenuItem(menuItem.Name));
+                                    }
+                                    existingForms = true;
+                                    this.MenuItems.Add(new MenuItem("\t" + form.Label, form));
                                 }
-                                existingForms = true;
-                                this.MenuItems.Add(new MenuItem("\t" + form.Label, form));
                             }
                         }
-                    }
-                    if (!this.AllForms.ContainsKey(form.Id))
-                    {
-                        this.AllForms.Add(form.Id, form);
+                        if (!this.AllForms.ContainsKey(form.Id))
+                        {
+                            this.AllForms.Add(form.Id, form);
+                        }
                     }
                 }
+            }
+            catch (Java.Lang.Exception ex)
+            {
+                Toast.MakeText(Application.Context, "Server is not available in this moment", ToastLength.Long).Show();
             }
         }
 

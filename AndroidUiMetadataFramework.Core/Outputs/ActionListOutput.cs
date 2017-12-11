@@ -47,7 +47,8 @@
             button.Click += async (sender, args) =>
             {
                 var formMetadata = myFormHandler.GetFormMetadata(btn.Form);
-                myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues, btn.Action);
+                var action = btn.Action?? FormLinkActions.OpenModal;
+                myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues, action);
             };
             return button;
         }

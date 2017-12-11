@@ -67,9 +67,9 @@
             return totalHeight;
         }
 
-        public static IEnumerable<object> GetTypeaheadSource(this object source,
+        public static IEnumerable<object> GetTypeaheadSource<T>(this object source,
             MyFormHandler myFormHandler,
-            TypeaheadRequest<string> request = null)
+            TypeaheadRequest<T> request = null)
         {
             if (source is IEnumerable<object>)
             {
@@ -87,19 +87,25 @@
                     InputFieldValues = obj
                 };
 
-                var result = Task.Run(
-                    () => myFormHandler.InvokeFormAsync(new[] { formRequest }, false));
-
-                var response = result.Result;
-
-                var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
-
-                if (typeahead != null)
+                try
                 {
-                    return typeahead.Items;
-                }
-            }
+                    var result = Task.Run(
+                        () => myFormHandler.InvokeFormAsync(new[] { formRequest }));
 
+                    var response = result.Result;
+
+                    var typeahead = response[0].Data.CastTObject<TypeaheadResponse<object>>();
+
+                    if (typeahead != null)
+                    {
+                        return typeahead.Items;
+                    }
+                }
+                catch (AggregateException ex)
+                {
+                    ex.ThrowInnerException();
+                }              
+            }
             return new List<object>();
         }
 
@@ -144,6 +150,16 @@
             var metrics = Application.Context.Resources.DisplayMetrics;
             var widthInDp = metrics.WidthPixels.ConvertPixelsToDp();
             return widthInDp.ConvertPixelsToDp();
+        }
+
+        public static void ThrowInnerException(this AggregateException exception)
+        {
+            var innerException = exception.InnerExceptions?.FirstOrDefault();
+            if (innerException != null)
+            {
+                throw innerException;
+            }
+            throw exception;
         }
     }
 }

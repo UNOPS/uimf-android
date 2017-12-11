@@ -117,6 +117,7 @@
     <Compile Include="Models\FormInputManager.cs" />
     <Compile Include="Models\Extension.cs" />
     <Compile Include="Models\FormWrapper.cs" />
+    <Compile Include="Models\HttpException.cs" />
     <Compile Include="Models\MyFormHandler.cs" />
     <Compile Include="Attributes\Input.cs" />
     <Compile Include="Inputs\PaginatorInput.cs" />

@@ -59,7 +59,7 @@
 			List<FormInputManager> inputsManager,
 			Dictionary<string, FormMetadata> allFormsMetadata)
 		{
-			Button btnLoadMore = new Button(Application.Context) { Text = "Load More" };
+			var btnLoadMore = new Button(Application.Context) { Text = "Load More" };
 			btnLoadMore.SetTextColor(Color.LightBlue);
 			btnLoadMore.SetBackgroundColor(Color.Transparent);
 			btnLoadMore.SetAllCaps(false);
@@ -73,7 +73,11 @@
 					PageIndex = this.PageIndex
 				});
 				var response = await myFormHandler.HandleFormAsync(formMetadata, inputsManager);
-
+			    if (response == null)
+			    {
+			      Toast.MakeText(Application.Context, "Error fetching data. Server returned status code: {0}", ToastLength.Long).Show();
+			      return;
+                }
 				object responsevalue;
 				if (response.Data.GetType() == typeof(JObject))
 				{

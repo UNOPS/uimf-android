@@ -64,6 +64,104 @@
         private FormRegister FormRegister { get; }
         private IMediator Mediator { get; }
 
+        public FormMetadata GetFormMetadata(string form)
+        {
+            FormMetadata formMetadata = null;
+            if (this.AllFormsMetadata != null && this.AllFormsMetadata.ContainsKey(form))
+            {
+                formMetadata = this.AllFormsMetadata[form];
+            }
+            else if (this.UiMetadataWebApi != null)
+            {
+                try
+                {
+                    var result = Task.Run(
+                        () => this.GetFormMetadataAsync(form));
+                    formMetadata = result.Result;
+                }
+                catch (AggregateException ex)
+                {
+                    ex.ThrowInnerException();
+                }
+            }
+            else
+            {
+                formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
+            }
+
+            return formMetadata;
+        }
+
+        public async Task<FormMetadata> GetFormMetadataAsync(string form)
+        {
+            var response = await UiMetadataHttpRequestHelper.GetFormMetadata(form, this.UiMetadataWebApi.FormMetadataUrl,
+                this.AppPreference.GetSharedKey("Cookies"));
+            return response;
+        }
+
+        public View GetIForm(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
+        {
+            if (formMetadata == null)
+            {
+                Toast.MakeText(Application.Context, "You don't have access to this form", ToastLength.Long).Show();
+                return null;
+            }
+            var formParameters = new FormParameters(formMetadata, inputFieldValues);
+            var layout = this.RenderForm(formParameters, submitAction);
+            return layout;
+        }
+
+        public View GetIForm(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
+        {
+            var formMetadata = this.GetFormMetadata(form);
+            var layout = this.GetIForm(formMetadata, inputFieldValues, submitAction);
+            return layout;
+        }
+
+        public async Task<InvokeForm.Response> HandleFormAsync(FormMetadata formMetadata, List<FormInputManager> inputsManager)
+        {
+            var obj = this.GetFormValues(inputsManager);
+            var request = new InvokeForm.Request
+            {
+                Form = formMetadata.Id,
+                InputFieldValues = obj
+            };
+            // run on form posting events
+            EventsManager.OnFormPostingEvent(formMetadata, inputsManager);
+
+            object resultData = null;
+            if (this.UiMetadataWebApi != null)
+            {
+                var result = await this.InvokeFormAsync(new[] { request });
+                if (result != null)
+                {
+                    resultData = result[0].Data;
+                }
+            }
+            else
+            {
+                var response = await this.Mediator.Send(request);
+                resultData = response.Data;
+            }
+
+            // run on response received events
+            EventsManager.OnResponseReceivedEvent(formMetadata, inputsManager, resultData);
+
+            return new InvokeForm.Response
+            {
+                Data = resultData
+            };
+        }
+
+        public async Task<List<InvokeForm.Response>> InvokeFormAsync(object param)
+        {
+            var response = await UiMetadataHttpRequestHelper.InvokeForm(this.UiMetadataWebApi.RunFormUrl, this.AppPreference.GetSharedKey("Cookies"),
+                param);
+
+            this.AppPreference.SetSharedKey("Cookies", response.Cookies);
+            return response.Response;
+        }
+
         public void RenderInputs(LinearLayout layout, FormParameters formParameters, List<FormInputManager> inputsManager)
         {
             var orderedInputs = formParameters.Form.InputFields.OrderBy(a => a.OrderIndex).ToList();
@@ -95,134 +193,26 @@
             }
         }
 
-        public FormMetadata GetFormMetadata(string form)
+        public async Task<View> StartIFormAsync(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
         {
-            FormMetadata formMetadata;
-            if (this.AllFormsMetadata != null && this.AllFormsMetadata.ContainsKey(form))
-            {
-                formMetadata = this.AllFormsMetadata[form];
-            }
-            else if (this.UiMetadataWebApi != null)
-            {
-                var result = Task.Run(
-                    () => this.GetFormMetadataAsync(form));
-                formMetadata = result.Result;
-            }
-            else
-            {
-                formMetadata = this.FormRegister.GetFormInfo(form)?.Metadata;
-            }
-
-            return formMetadata;
-        }
-
-        public async Task<FormMetadata> GetFormMetadataAsync(string form)
-        {
-            var response = await UiMetadataHttpRequestHelper.GetFormMetadata(form, this.UiMetadataWebApi.FormMetadataUrl,
-                this.AppPreference.GetSharedKey("Cookies"));
-
-            if (response == null)
-            {
-                Toast.MakeText(Application.Context, "Error fetching data. Server returned status code: {0}", ToastLength.Long).Show();
-                return null;
-            }
-            return response;
-        }
-
-        public View GetIForm(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
-        {
-            if (formMetadata == null)
-            {
-                Toast.MakeText(Application.Context, "You don't have access to this form", ToastLength.Long).Show();
-                return null;
-            }
+            var formMetadata = this.GetFormMetadata(form);
             var formParameters = new FormParameters(formMetadata, inputFieldValues);
             var layout = this.RenderForm(formParameters, submitAction);
             return layout;
         }
 
-        public View GetIForm(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
+        private string GetFormValues(IEnumerable<FormInputManager> inputsManager)
         {
-            var formMetadata = this.GetFormMetadata(form);
-            var layout = this.GetIForm(formMetadata, inputFieldValues, submitAction);
-            return layout;
-        }
-
-        public async Task<InvokeForm.Response> HandleFormAsync(FormMetadata formMetadata, List<FormInputManager> inputsManager)
-        {
-            try
+            var list = new Dictionary<string, object>();
+            foreach (var inputManager in inputsManager)
             {
-                var obj = this.GetFormValues(inputsManager);
-                var request = new InvokeForm.Request
+                var value = inputManager.Manager.GetValue();
+                if (value != null)
                 {
-                    Form = formMetadata.Id,
-                    InputFieldValues = obj
-                };
-                // run on form posting events
-                EventsManager.OnFormPostingEvent(formMetadata, inputsManager);
-
-                object resultData = null;
-                if (this.UiMetadataWebApi != null)
-                {
-                    var result = await this.InvokeFormAsync(new[] { request });
-                    if (result != null)
-                    {
-                        resultData = result[0].Data;
-                    }
+                    list.Add(inputManager.Input.Id, value);
                 }
-                else
-                {
-                    var response = await this.Mediator.Send(request);
-                    resultData = response.Data;
-                }
-
-                // run on response received events
-                EventsManager.OnResponseReceivedEvent(formMetadata, inputsManager, resultData);
-
-                return new InvokeForm.Response
-                {
-                    Data = resultData
-                };
             }
-            catch (Exception ex)
-            {
-                Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
-                return null;
-            }
-        }
-
-        public async Task<List<InvokeForm.Response>> InvokeFormAsync(object param, bool setCookies = true)
-        {
-            var response = await UiMetadataHttpRequestHelper.InvokeForm(this.UiMetadataWebApi.RunFormUrl, this.AppPreference.GetSharedKey("Cookies"),
-                param);
-
-            if (setCookies)
-            {
-                this.AppPreference.SetSharedKey("Cookies", response.Cookies);
-            }
-
-            if (response.Response == null)
-            {
-                Toast.MakeText(Application.Context, "Error fetching data. Server returned status code: {0}", ToastLength.Long).Show();
-                return null;
-            }
-            return response.Response;
-        }
-
-        public async Task<View> StartIFormAsync(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
-        {
-            try
-            {
-                var formMetadata = this.GetFormMetadata(form);
-                var formParameters = new FormParameters(formMetadata, inputFieldValues);
-                var layout = this.RenderForm(formParameters, submitAction);
-                return layout;
-            }
-            catch (Exception ex)
-            {
-                Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
-                return null;
-            }
+            return JsonConvert.SerializeObject(list);
         }
 
         private View RenderForm(FormParameters formParameters, string submitAction)
@@ -258,6 +248,7 @@
                         btn.Click += async (sender, args) =>
                         {
                             result = await this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager);
+
                             if (submitAction == FormLinkActions.OpenModal)
                             {
                                 this.FormWrapper.CloseForm();
@@ -265,18 +256,26 @@
                             else
                             {
                                 this.RenderOutput(resultLayout, result, formParameters.Form, inputsManager);
-                            }                           
+                            }
                         };
                     }
                 }
                 // run on response handled events
                 EventsManager.OnFormLoadedEvent(formParameters);
 
-                if (formParameters.Form.PostOnLoad)
+                if (formParameters.Form.PostOnLoad || submitAction == FormLinkActions.Run)
                 {
-                    var task = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager,
-                        formParameters.Form.PostOnLoadValidation));
-                    result = task.Result;
+                    try
+                    {
+                        var taskToRun = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager,
+                            formParameters.Form.PostOnLoadValidation));
+                        result = taskToRun.Result;
+                    }
+                    catch (AggregateException ex)
+                    {
+                        ex.ThrowInnerException();
+                    }
+
                     if (submitAction == FormLinkActions.Run)
                     {
                         this.FormWrapper.CloseForm();
@@ -284,7 +283,7 @@
                     else
                     {
                         this.RenderOutput(resultLayout, result, formParameters.Form, inputsManager);
-                    }                   
+                    }
                 }
                 linearLayout.AddView(resultLayout, linearLayout.MatchParentWrapContent());
                 scroll.AddView(linearLayout, scroll.MatchParentWrapContent());
@@ -334,32 +333,19 @@
             EventsManager.OnResponseHandledEvent(this, formMetadata, inputsManager, result);
         }
 
-        private object GetFormValues(IEnumerable<FormInputManager> inputsManager)
-        {
-            var list = new Dictionary<string, object>();
-            foreach (var inputManager in inputsManager)
-            {
-                var value =  inputManager.Manager.GetValue();
-                if (value != null)
-                {
-                    list.Add(inputManager.Input.Id, value);
-                }
-            }
-            return JsonConvert.SerializeObject(list);
-        }
-
         private async Task<InvokeForm.Response> SubmitFormAsync(ViewGroup resultLayout,
             FormMetadata formMetadata,
             List<FormInputManager> inputsManager,
             bool validate = true)
         {
             var valid = !validate || this.ValidateForm(inputsManager);
+            InvokeForm.Response result = null;
             if (valid)
             {
                 resultLayout.RemoveAllViews();
-                return await this.HandleFormAsync(formMetadata, inputsManager);
+                result = await this.HandleFormAsync(formMetadata, inputsManager);
             }
-            return null;
+            return result;
         }
 
         private bool ValidateForm(IEnumerable<FormInputManager> inputsManager)
