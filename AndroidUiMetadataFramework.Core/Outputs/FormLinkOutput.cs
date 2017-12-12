@@ -40,7 +40,7 @@
             text.Click += async (sender, args) =>
             {
                 var formMetadata = myFormHandler.GetFormMetadata(btn.Form);
-                myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues);
+                myFormHandler.FormWrapper.UpdateView(myFormHandler, new FormParameter(formMetadata, btn.InputFieldValues));
             };
             return text;
         }

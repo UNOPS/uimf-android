@@ -3,9 +3,9 @@
 	using System.Collections.Generic;
 	using UiMetadataFramework.Core;
 
-	public class FormParameters
+	public class FormParameter
 	{
-		public FormParameters(FormMetadata form, IDictionary<string, object> parameters)
+		public FormParameter(FormMetadata form, IDictionary<string, object> parameters = null)
 		{
 			this.Form = form;
 			this.Parameters = parameters;

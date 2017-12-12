@@ -112,6 +112,20 @@
             {
                 this.AppLayouts.Add(new MyFormWrapper(this));
             }
+
+
+            var refresher = this.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+            refresher.SetColorScheme(Resource.Color.blue,
+                Resource.Color.white,
+                Resource.Color.pink,
+                Resource.Color.black);
+            refresher.Refresh += delegate
+            {
+                var wrapper = this.AppLayouts[this.AppLayouts.Count - 1];
+                var fragment = new MyFormWrapper(wrapper.FormParameter, wrapper.MyFormHandler, this, wrapper.SubmitAction);
+                fragment.UpdateFragment(Resource.Id.content_frame);
+                refresher.Refreshing = false;
+            };
         }
 
         protected override void OnPostCreate(Bundle savedInstanceState)
@@ -213,7 +227,7 @@
         {
             if (this.MenuItems[position].FormMetadata != null)
             {
-                this.FormWrapper.UpdateView(this.MyFormHandler, this.MenuItems[position].FormMetadata);
+                this.FormWrapper.UpdateView(this.MyFormHandler, new FormParameter(this.MenuItems[position].FormMetadata));
                 // update selected item title, then close the drawer
                 this.Title = this.MenuItems[position].Label;
                 this.DrawerLayout.CloseDrawer(this.DrawerList);

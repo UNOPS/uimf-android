@@ -1,18 +1,14 @@
 ﻿namespace AndroidUiMetadataFramework.Core.Models
 {
-    using System.Collections.Generic;
     using UiMetadataFramework.Basic.Response;
-    using UiMetadataFramework.Core;
 
     public interface IFormWrapper
     {
+        void CloseForm();
         void ReloadView(MyFormHandler myFormHandler, ReloadResponse reloadResponse);
 
         void UpdateView(MyFormHandler myFormHandler,
-            FormMetadata metadata,
-            IDictionary<string, object> inputFieldValues = null,
+            FormParameter formParameter,
             string submitAction = null);
-
-        void CloseForm();
     }
 }

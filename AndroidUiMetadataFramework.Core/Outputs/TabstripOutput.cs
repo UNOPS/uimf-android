@@ -47,7 +47,7 @@
                     {
                         var metadata = myFormHandler.GetFormMetadata(tab.Form);
 
-                        myFormHandler.FormWrapper.UpdateView(myFormHandler, metadata, tab.InputFieldValues);
+                        myFormHandler.FormWrapper.UpdateView(myFormHandler, new FormParameter(metadata, tab.InputFieldValues));
                     };
                     var row = GridLayout.InvokeSpec(rowIndex);
                     var column = GridLayout.InvokeSpec(columnIndex);

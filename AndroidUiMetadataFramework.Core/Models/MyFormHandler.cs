@@ -99,22 +99,21 @@
             return response;
         }
 
-        public View GetIForm(FormMetadata formMetadata, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
+        public View GetIForm(FormParameter formParameter, string submitAction = null)
         {
-            if (formMetadata == null)
+            if (formParameter?.Form == null)
             {
                 Toast.MakeText(Application.Context, "You don't have access to this form", ToastLength.Long).Show();
                 return null;
             }
-            var formParameters = new FormParameters(formMetadata, inputFieldValues);
-            var layout = this.RenderForm(formParameters, submitAction);
+            var layout = this.RenderForm(formParameter, submitAction);
             return layout;
         }
 
         public View GetIForm(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
         {
             var formMetadata = this.GetFormMetadata(form);
-            var layout = this.GetIForm(formMetadata, inputFieldValues, submitAction);
+            var layout = this.GetIForm(new FormParameter(formMetadata, inputFieldValues), submitAction);
             return layout;
         }
 
@@ -162,9 +161,9 @@
             return response.Response;
         }
 
-        public void RenderInputs(LinearLayout layout, FormParameters formParameters, List<FormInputManager> inputsManager)
+        public void RenderInputs(LinearLayout layout, FormParameter formParameter, List<FormInputManager> inputsManager)
         {
-            var orderedInputs = formParameters.Form.InputFields.OrderBy(a => a.OrderIndex).ToList();
+            var orderedInputs = formParameter.Form.InputFields.OrderBy(a => a.OrderIndex).ToList();
             inputsManager.Clear();
 
             foreach (var input in orderedInputs)
@@ -178,7 +177,7 @@
                 var manager = this.InputManagerCollection.GetManager(input.Type);
 
                 var view = manager.GetView(input.CustomProperties, this);
-                var value = formParameters.Parameters?.SingleOrDefault(a => a.Key.ToLower().Equals(input.Id.ToLower())).Value;
+                var value = formParameter.Parameters?.SingleOrDefault(a => a.Key.ToLower().Equals(input.Id.ToLower())).Value;
                 if (value != null)
                 {
                     manager.SetValue(value);
@@ -196,7 +195,7 @@
         public async Task<View> StartIFormAsync(string form, IDictionary<string, object> inputFieldValues = null, string submitAction = null)
         {
             var formMetadata = this.GetFormMetadata(form);
-            var formParameters = new FormParameters(formMetadata, inputFieldValues);
+            var formParameters = new FormParameter(formMetadata, inputFieldValues);
             var layout = this.RenderForm(formParameters, submitAction);
             return layout;
         }
@@ -215,27 +214,27 @@
             return JsonConvert.SerializeObject(list);
         }
 
-        private View RenderForm(FormParameters formParameters, string submitAction)
+        private View RenderForm(FormParameter formParameter, string submitAction)
         {
             var scroll = new ScrollView(Application.Context);
             var linearLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
             linearLayout.SetPadding(20, 10, 20, 10);
 
-            if (formParameters != null)
+            if (formParameter != null)
             {
                 InvokeForm.Response result = null;
                 var inputsManager = new List<FormInputManager>();
                 var resultLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
                 resultLayout.SetPadding(20, 10, 20, 10);
 
-                if (formParameters.Form.InputFields.Count > 0)
+                if (formParameter.Form.InputFields.Count > 0)
                 {
-                    this.RenderInputs(linearLayout, formParameters, inputsManager);
+                    this.RenderInputs(linearLayout, formParameter, inputsManager);
 
-                    if (formParameters.Form.InputFields.Count(a => !a.Hidden) > 0)
+                    if (formParameter.Form.InputFields.Count(a => !a.Hidden) > 0)
                     {
                         var submitLabel = "Submit";
-                        var submitbuttonlabel = formParameters.Form.CustomProperties?.GetCustomProperty<string>("submitButtonLabel");
+                        var submitbuttonlabel = formParameter.Form.CustomProperties?.GetCustomProperty<string>("submitButtonLabel");
 
                         if (!string.IsNullOrEmpty(submitbuttonlabel))
                         {
@@ -247,7 +246,7 @@
 
                         btn.Click += async (sender, args) =>
                         {
-                            result = await this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager);
+                            result = await this.SubmitFormAsync(resultLayout, formParameter.Form, inputsManager);
 
                             if (submitAction == FormLinkActions.OpenModal)
                             {
@@ -255,20 +254,20 @@
                             }
                             else
                             {
-                                this.RenderOutput(resultLayout, result, formParameters.Form, inputsManager);
+                                this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
                             }
                         };
                     }
                 }
                 // run on response handled events
-                EventsManager.OnFormLoadedEvent(formParameters);
+                EventsManager.OnFormLoadedEvent(formParameter);
 
-                if (formParameters.Form.PostOnLoad || submitAction == FormLinkActions.Run)
+                if (formParameter.Form.PostOnLoad || submitAction == FormLinkActions.Run)
                 {
                     try
                     {
-                        var taskToRun = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameters.Form, inputsManager,
-                            formParameters.Form.PostOnLoadValidation));
+                        var taskToRun = Task.Run(() => this.SubmitFormAsync(resultLayout, formParameter.Form, inputsManager,
+                            formParameter.Form.PostOnLoadValidation));
                         result = taskToRun.Result;
                     }
                     catch (AggregateException ex)
@@ -282,7 +281,7 @@
                     }
                     else
                     {
-                        this.RenderOutput(resultLayout, result, formParameters.Form, inputsManager);
+                        this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
                     }
                 }
                 linearLayout.AddView(resultLayout, linearLayout.MatchParentWrapContent());

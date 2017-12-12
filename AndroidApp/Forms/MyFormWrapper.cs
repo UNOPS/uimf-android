@@ -11,16 +11,14 @@
 
     public class MyFormWrapper : Fragment
     {
-        public MyFormWrapper(FormMetadata form,
+        public MyFormWrapper(FormParameter formParameter,
             MyFormHandler myFormHandler,
             Activity ownerActivity,
-            IDictionary<string, object> inputFieldValues = null,
             string submitAction = null)
         {
             this.MyFormHandler = myFormHandler;
-            this.FormMetadata = form;
+            this.FormParameter = formParameter;
             this.OwnerActivity = ownerActivity;
-            this.InputFieldValues = inputFieldValues;
             this.SubmitAction = submitAction;
         }
 
@@ -29,8 +27,7 @@
             this.OwnerActivity = ownerActivity;
         }
 
-        public FormMetadata FormMetadata { get; set; }
-        public IDictionary<string, object> InputFieldValues { get; set; }
+        public FormParameter FormParameter { get; set; }
         public MyFormHandler MyFormHandler { get; set; }
         public Activity OwnerActivity { get; set; }
         public View RootView { get; set; }
@@ -50,10 +47,10 @@
             {
                 try
                 {
-                    var form = this.MyFormHandler.GetIForm(this.FormMetadata, this.InputFieldValues, this.SubmitAction);
+                    var form = this.MyFormHandler.GetIForm(this.FormParameter, this.SubmitAction);
                     if (form != null)
                     {
-                        this.RootView = form;
+                        this.RootView = form;                        
                     }
                     else
                     {
@@ -71,7 +68,7 @@
             var ft = fragmentManager.BeginTransaction();
             ft.Replace(resId, this);
             ft.Commit();
-            this.OwnerActivity.Title = this.FormMetadata?.Label;
+            this.OwnerActivity.Title = this.FormParameter?.Form == null ? "GMS" : this.FormParameter.Form?.Label;
         }
     }
 }

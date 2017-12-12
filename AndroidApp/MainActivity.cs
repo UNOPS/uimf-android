@@ -41,7 +41,7 @@
             if (string.IsNullOrEmpty(appPreference.GetSharedKey("Cookies")))
             {
                 var metadata = this.MyFormHandler.GetFormMetadata("login");
-                this.FormWrapper.UpdateView(this.MyFormHandler, metadata);
+                this.FormWrapper.UpdateView(this.MyFormHandler, new FormParameter(metadata));
             }
             else
             {

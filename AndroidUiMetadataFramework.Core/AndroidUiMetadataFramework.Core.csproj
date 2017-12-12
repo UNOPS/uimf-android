@@ -113,7 +113,7 @@
     <Compile Include="Managers\EventsManager.cs" />
     <Compile Include="Models\AppSharedPreference.cs" />
     <Compile Include="Attributes\Output.cs" />
-    <Compile Include="Models\FormParameters.cs" />
+    <Compile Include="Models\FormParameter.cs" />
     <Compile Include="Models\FormInputManager.cs" />
     <Compile Include="Models\Extension.cs" />
     <Compile Include="Models\FormWrapper.cs" />

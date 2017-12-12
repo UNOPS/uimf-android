@@ -184,6 +184,9 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\drawer_shadow.png" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\theme.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

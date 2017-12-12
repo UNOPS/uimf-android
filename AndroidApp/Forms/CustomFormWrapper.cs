@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using AndroidUiMetadataFramework.Core.Models;
     using UiMetadataFramework.Basic.Response;
-    using UiMetadataFramework.Core;
 
     public class CustomFormWrapper : IFormWrapper
     {
@@ -18,11 +17,9 @@
         public List<MyFormWrapper> AppFragments { get; set; }
         public int ContentResourceId { get; set; }
 
-        public void UpdateView(MyFormHandler myFormHandler, FormMetadata metadata, 
-            IDictionary<string, object> inputFieldValues = null, 
-            string submitAction = null)
+        public void UpdateView(MyFormHandler myFormHandler, FormParameter formParameter, string submitAction = null)
         {
-            var fragment = new MyFormWrapper(metadata, myFormHandler, this.Activity, inputFieldValues, submitAction);
+            var fragment = new MyFormWrapper(formParameter, myFormHandler, this.Activity, submitAction);
             this.AppFragments?.Add(fragment);
             fragment.UpdateFragment(this.ContentResourceId);
         }
@@ -40,7 +37,7 @@
         {
             var allForms = this.Activity.Reload();
             var metadata = allForms[reloadResponse.Form];
-            this.UpdateView(myFormHandler, metadata, reloadResponse.InputFieldValues);
+            this.UpdateView(myFormHandler, new FormParameter(metadata, reloadResponse.InputFieldValues));
         }
     }
 }

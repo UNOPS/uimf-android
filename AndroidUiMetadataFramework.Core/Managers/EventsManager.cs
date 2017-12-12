@@ -8,7 +8,7 @@
 
     public static class EventsManager
     {
-        public static void OnFormLoadedEvent(FormParameters formParameters)
+        public static void OnFormLoadedEvent(FormParameter formParameter)
         {
         }
 

@@ -4,11 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+  <android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/refresher"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+      android:id="@+id/content_frame"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+  </android.support.v4.widget.SwipeRefreshLayout>
+    
     <android.support.v7.widget.RecyclerView
         android:id="@+id/left_drawer"
         android:scrollbars="vertical"

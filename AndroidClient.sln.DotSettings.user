@@ -3,4 +3,4 @@
   &lt;Assembly Path="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v7.1\Mono.Android.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Mobile\uimf-android\packages\StructureMap.4.5.1\lib\netstandard1.5\StructureMap.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UpdatesManger/LastUpdateCheck/@EntryValue">12/10/2017 15:16:02</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/Environment/UpdatesManger/LastUpdateCheck/@EntryValue">12/11/2017 15:16:04</s:String></wpf:ResourceDictionary>

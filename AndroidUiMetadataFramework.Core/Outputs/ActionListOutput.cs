@@ -47,7 +47,7 @@
             {
                 var formMetadata = myFormHandler.GetFormMetadata(btn.Form);
                 var action = btn.Action ?? FormLinkActions.OpenModal;
-                myFormHandler.FormWrapper.UpdateView(myFormHandler, formMetadata, btn.InputFieldValues, action);
+                myFormHandler.FormWrapper.UpdateView(myFormHandler, new FormParameter(formMetadata, btn.InputFieldValues), action);
             };
             return button;
         }
