@@ -31,7 +31,7 @@
                 Adapter = adapter,
                 Threshold = 0
             };
-
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("EditText", this.InputText);
             this.InputText.TextChanged += async (sender, args) =>
             {
                 adapter.Clear();

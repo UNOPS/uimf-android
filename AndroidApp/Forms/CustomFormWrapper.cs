@@ -6,7 +6,7 @@
 
     public class CustomFormWrapper : IFormWrapper
     {
-        public CustomFormWrapper(FormsActivity activity, List<MyFormWrapper> appFragments, int contentResourceId)
+        public CustomFormWrapper(FormsActivity activity, List<MyFormFragment> appFragments, int contentResourceId)
         {
             this.Activity = activity;
             this.AppFragments = appFragments;
@@ -14,12 +14,12 @@
         }
 
         public FormsActivity Activity { get; set; }
-        public List<MyFormWrapper> AppFragments { get; set; }
+        public List<MyFormFragment> AppFragments { get; set; }
         public int ContentResourceId { get; set; }
 
         public void UpdateView(MyFormHandler myFormHandler, FormParameter formParameter, string submitAction = null)
         {
-            var fragment = new MyFormWrapper(formParameter, myFormHandler, this.Activity, submitAction);
+            var fragment = new MyFormFragment(formParameter, myFormHandler, this.Activity, submitAction);
             this.AppFragments?.Add(fragment);
             fragment.UpdateFragment(this.ContentResourceId);
         }

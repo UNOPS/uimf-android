@@ -17,7 +17,8 @@
 		public View GetView(IDictionary<string, object> inputCustomProperties, MyFormHandler myFormHandler)
 		{
 			this.InputText = new EditText(Application.Context) { InputType = InputTypes.ClassText };
-			return this.InputText;
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("EditText", this.InputText);
+            return this.InputText;
 		}
 
 		public object GetValue()

@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Android.Graphics;
     using Android.Views;
     using Android.Widget;
     using Newtonsoft.Json.Linq;
@@ -40,7 +41,6 @@
             {
                 view = new LinearLayout(parent.Context) { Orientation = Orientation.Vertical };
                 var param = view.MatchParentWrapContent();
-
                 var orderedOutputs = this.OutputFieldProperty.OrderBy(a => a.OrderIndex);
 
                 foreach (var output in orderedOutputs)
@@ -60,10 +60,9 @@
                         }
                         if (value != null)
                         {
-                            var manager = this.MyFormHandler.OutputManagerCollection.GetManager(output.Type);
+                            var manager = this.MyFormHandler.ManagersCollection.OutputManagerCollection.GetManager(output.Type);
                             var outputView = manager.GetView(output, value, this.MyFormHandler, null, null);
                             view.AddView(outputView, param);
-                            view.SetPadding(0, 10, 0, 10);
                             viewHolder.Objects.Add(outputView);
                         }
                     }
@@ -71,8 +70,9 @@
 
                 view.LayoutParameters = param;
                 view.Tag = viewHolder;
+                this.MyFormHandler.ManagersCollection.StyleRegister.ApplyStyle("ListViewItem", view);
             }
-
+           
             return view;
         }
     }

@@ -15,7 +15,7 @@
     [Activity(Label = "GMS", MainLauncher = false, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
     public class MainActivity : AppCompatActivity
     {
-        public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
+        public List<MyFormFragment> AppLayouts = new List<MyFormFragment>();
         public EventHandlerManagerCollection EventManager { get; set; }
         public CustomFormWrapper FormWrapper { get; set; }
         private InputManagerCollection InputManager { get; set; }
@@ -35,9 +35,10 @@
                 RunFormUrl = "http://10.0.2.2:58337/api/form/run"
             };
             // this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.main_content_frame);
-            this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager,
+            this.MyFormHandler = new MyFormHandler(this.UiMetadataWebApi, new ManagersCollection(),
                 this.FormWrapper);
             var appPreference = new AppSharedPreference(Application.Context);
+
             if (string.IsNullOrEmpty(appPreference.GetSharedKey("Cookies")))
             {
                 var metadata = this.MyFormHandler.GetFormMetadata("login");

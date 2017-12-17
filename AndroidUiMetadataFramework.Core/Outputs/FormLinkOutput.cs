@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using Android.App;
-    using Android.Graphics;
     using Android.Views;
     using Android.Widget;
     using AndroidUiMetadataFramework.Core.Attributes;
@@ -24,18 +23,30 @@
         {
             var formLink = value.CastTObject<FormLink>();
             this.Layout = new LinearLayout(Application.Context) { Orientation = Orientation.Horizontal };
-            this.Layout.AddView(new TextView(Application.Context) { Text = outputField.Label + ": " });
-            var text = formLink != null ? this.InitializeLink(formLink, myFormHandler) : new TextView(Application.Context) { Text = "" };
+            var link = new TextView(Application.Context)
+            {
+                Text = outputField.Label + ": "
+            };
 
-            this.Layout.AddView(text);
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", link);
+            this.Layout.AddView(link);           
+
+            if (formLink != null)
+            {
+                var text = this.InitializeLink(formLink, myFormHandler);
+                myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("Link", text);
+                this.Layout.AddView(text);
+            }
+
             return this.Layout;
         }
 
         public TextView InitializeLink(FormLink btn, MyFormHandler myFormHandler)
         {
-            var text = new TextView(Application.Context) { Text = btn.Label };
-            text.SetBackgroundColor(Color.Transparent);
-            text.SetTextColor(Color.LightBlue);
+            var text = new TextView(Application.Context)
+            {
+                Text = btn.Label
+            };
 
             text.Click += async (sender, args) =>
             {

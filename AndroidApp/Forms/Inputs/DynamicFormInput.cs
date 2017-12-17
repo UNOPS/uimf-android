@@ -44,12 +44,12 @@
                 var value = inputManager.Manager.GetValue();
                 if (value == null && inputManager.Input.Required)
                 {
+                    this.FormHandler.ManagersCollection.StyleRegister.ApplyStyle("ValidationError", inputManager.InputView);
                     return null;
                 }
                 
                 inputManager.Input.Value = value?.ToString();
-                var dropdownValue = value as DropdownValue<string>;
-                if (dropdownValue != null)
+                if (value is DropdownValue<string> dropdownValue)
                 {
                     inputManager.Input.Value = dropdownValue.Value;
                 }
@@ -70,16 +70,19 @@
             foreach (var input in orderedInputs)
             {
                 var label = new TextView(Application.Context) { Text = input.Label.Humanize(LetterCasing.Sentence) };
+                label.LayoutParameters = label.WrapContent();
+                this.FormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", label);
+
                 this.Layout.AddView(label, this.Layout.MatchParentWrapContent());
 
-                var manager = this.FormHandler.InputManagerCollection.GetManager(input.Type);
+                var manager = this.FormHandler.ManagersCollection.InputManagerCollection.GetManager(input.Type);
 
                 var view = manager.GetView(input.CustomProperties, this.FormHandler);
                 if (input.Value != null)
                 {
                     manager.SetValue(input.Value);
                 }
-                this.InputsManager.Add(new FormInputManager(input, manager));
+                this.InputsManager.Add(new FormInputManager(input, manager, view));
                 this.Layout.AddView(view, this.Layout.MatchParentWrapContent());
             }
         }
@@ -105,13 +108,15 @@
 
     public class FormInputManager
     {
-        public FormInputManager(InputItem input, IInputManager manager)
+        public FormInputManager(InputItem input, IInputManager manager, View view)
         {
             this.Input = input;
             this.Manager = manager;
+            this.InputView = view;
         }
 
         public InputItem Input { get; set; }
+        public View InputView { get; set; }
         public IInputManager Manager { get; set; }
     }
 }

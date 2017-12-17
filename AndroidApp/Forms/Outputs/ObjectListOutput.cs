@@ -23,16 +23,16 @@
         {
             this.OutputList = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
             var label = new TextView(Application.Context) { Text = outputField.Label };
-            this.OutputList.AddView(label, this.OutputList.MatchParentWrapContent());
+            label.LayoutParameters = label.WrapContent();
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", label);
+            this.OutputList.AddView(label);
             var list = value.CastTObject<ObjectList<object>>();
             var listView = new ListView(Application.Context);
-            listView.SetPadding(10, 0, 10, 0);
-            listView.FastScrollEnabled = true;
             var adapter = new ListCustomAdapter<object>(list.Items.ToList(), list.Metadata, myFormHandler);
             listView.Adapter = adapter;
-
-            var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, listView.GetListHeigth());
-            this.OutputList.AddView(listView, param);
+            listView.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, listView.GetListHeigth());
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("ListView", listView);
+            this.OutputList.AddView(listView);
             return this.OutputList;
         }
     }

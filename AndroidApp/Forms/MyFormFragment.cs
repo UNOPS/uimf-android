@@ -1,17 +1,15 @@
 ﻿namespace AndroidApp.Forms
 {
     using System;
-    using System.Collections.Generic;
     using Android.App;
     using Android.OS;
     using Android.Views;
     using Android.Widget;
     using AndroidUiMetadataFramework.Core.Models;
-    using UiMetadataFramework.Core;
 
-    public class MyFormWrapper : Fragment
+    public class MyFormFragment : Fragment
     {
-        public MyFormWrapper(FormParameter formParameter,
+        public MyFormFragment(FormParameter formParameter,
             MyFormHandler myFormHandler,
             Activity ownerActivity,
             string submitAction = null)
@@ -22,7 +20,7 @@
             this.SubmitAction = submitAction;
         }
 
-        public MyFormWrapper(Activity ownerActivity)
+        public MyFormFragment(Activity ownerActivity)
         {
             this.OwnerActivity = ownerActivity;
         }
@@ -50,7 +48,7 @@
                     var form = this.MyFormHandler.GetIForm(this.FormParameter, this.SubmitAction);
                     if (form != null)
                     {
-                        this.RootView = form;                        
+                        this.RootView = form;
                     }
                     else
                     {
@@ -62,8 +60,8 @@
                     Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
                     return;
                 }
-            }            
-           
+            }
+
             var fragmentManager = this.OwnerActivity.FragmentManager;
             var ft = fragmentManager.BeginTransaction();
             ft.Replace(resId, this);

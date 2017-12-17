@@ -3,17 +3,16 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-  <android.support.v4.widget.SwipeRefreshLayout
-    android:id="@+id/refresher"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <FrameLayout
-      android:id="@+id/content_frame"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
-  </android.support.v4.widget.SwipeRefreshLayout>
-    
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFF" />
+    </android.support.v4.widget.SwipeRefreshLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/left_drawer"
         android:scrollbars="vertical"
@@ -21,5 +20,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="left|start"
         android:choiceMode="singleChoice"
-        android:divider="@null" />
+        android:listDivider="@color/pink"/>
+  
 </android.support.v4.widget.DrawerLayout>

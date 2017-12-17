@@ -17,11 +17,13 @@
     using AndroidApp.Forms.Inputs;
     using AndroidApp.Forms.Menu;
     using AndroidApp.Forms.Outputs;
+    using AndroidApp.Styles;
     using AndroidUiMetadataFramework.Core.EventHandlers;
     using AndroidUiMetadataFramework.Core.Inputs;
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
     using AndroidUiMetadataFramework.Core.Outputs;
+    using App.Style;
     using Java.Lang;
     using Newtonsoft.Json;
     using UiMetadataFramework.Core;
@@ -29,18 +31,16 @@
     [Activity(Label = "GMS", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
     public class FormsActivity : AppCompatActivity, DrawerListAdapter.IOnItemClickListener
     {
-        public List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
-        public EventHandlerManagerCollection EventManager { get; set; }
+        public List<MyFormFragment> AppLayouts = new List<MyFormFragment>();
+        public ManagersCollection ManagersCollection { get; set; }
 
         public CustomFormWrapper FormWrapper { get; set; }
         private Dictionary<string, FormMetadata> AllForms { get; set; }
         private DrawerLayout DrawerLayout { get; set; }
         private RecyclerView DrawerList { get; set; }
         private ActionBarDrawerToggle DrawerToggle { get; set; }
-        private InputManagerCollection InputManager { get; set; }
         private List<MenuItem> MenuItems { get; set; }
         private MyFormHandler MyFormHandler { get; set; }
-        private OutputManagerCollection OutputManager { get; set; }
         private UiMetadataWebApi UiMetadataWebApi { get; set; }
 
         /* The click listener for RecyclerView in the navigation drawer */
@@ -105,14 +105,13 @@
             this.GetAllFormsMetadata();
 
             this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.content_frame);
-            this.MyFormHandler = new MyFormHandler(this, this.UiMetadataWebApi, this.InputManager, this.OutputManager, this.EventManager,
-                this.FormWrapper, this.AllForms);
+            
+            this.MyFormHandler = new MyFormHandler(this.UiMetadataWebApi,this.ManagersCollection,this.FormWrapper, this.AllForms);
             this.InitializeDrawerLayout();
             if (this.AppLayouts.Count == 0)
             {
-                this.AppLayouts.Add(new MyFormWrapper(this));
+                this.AppLayouts.Add(new MyFormFragment(this));
             }
-
 
             var refresher = this.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
             refresher.SetColorScheme(Resource.Color.blue,
@@ -122,7 +121,7 @@
             refresher.Refresh += delegate
             {
                 var wrapper = this.AppLayouts[this.AppLayouts.Count - 1];
-                var fragment = new MyFormWrapper(wrapper.FormParameter, wrapper.MyFormHandler, this, wrapper.SubmitAction);
+                var fragment = new MyFormFragment(wrapper.FormParameter, wrapper.MyFormHandler, this, wrapper.SubmitAction);
                 fragment.UpdateFragment(Resource.Id.content_frame);
                 refresher.Refreshing = false;
             };
@@ -181,7 +180,7 @@
                     }
                 }
             }
-            catch (Exception)
+            catch (System.Exception)
             {
                 Toast.MakeText(Application.Context, "Server is not available in this moment", ToastLength.Long).Show();
             }
@@ -197,7 +196,7 @@
             this.DrawerList.HasFixedSize = true;
             this.DrawerList.SetLayoutManager(new LinearLayoutManager(this));
             this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
-            this.DrawerList.SetBackgroundColor(Color.White);
+            this.DrawerList.SetBackgroundColor(Color.ParseColor("#343d49"));
             this.SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             this.SupportActionBar.SetHomeButtonEnabled(true);
 
@@ -211,16 +210,26 @@
 
         private void RegisterManagers()
         {
-            this.InputManager = new InputManagerCollection();
-            this.InputManager.RegisterAssembly(typeof(TextInput).Assembly);
-            this.InputManager.RegisterAssembly(typeof(DynamicFormInput).Assembly);
+            var inputManager = new InputManagerCollection();
+            inputManager.RegisterAssembly(typeof(TextInput).Assembly);
+            inputManager.RegisterAssembly(typeof(DynamicFormInput).Assembly);
 
-            this.OutputManager = new OutputManagerCollection();
-            this.OutputManager.RegisterAssembly(typeof(TextOutput).Assembly);
-            this.OutputManager.RegisterAssembly(typeof(ObjectListOutput).Assembly);
+            var outputManager = new OutputManagerCollection();
+            outputManager.RegisterAssembly(typeof(TextOutput).Assembly);
+            outputManager.RegisterAssembly(typeof(ObjectListOutput).Assembly);
 
-            this.EventManager = new EventHandlerManagerCollection();
-            this.EventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
+            var eventManager = new EventHandlerManagerCollection();
+            eventManager.RegisterAssembly(typeof(BindToOutputEventHandler).Assembly);
+
+            var styleRegister = new StyleRegister();
+            styleRegister.RegisterAssembly(typeof(TextViewStyle).Assembly);
+            this.ManagersCollection = new ManagersCollection()
+            {
+                InputManagerCollection = inputManager,
+                OutputManagerCollection = outputManager,
+                EventHandlerManagerCollection = eventManager,
+                StyleRegister = styleRegister
+            };
         }
 
         private void SelectItem(int position)
@@ -229,7 +238,6 @@
             {
                 this.FormWrapper.UpdateView(this.MyFormHandler, new FormParameter(this.MenuItems[position].FormMetadata));
                 // update selected item title, then close the drawer
-                this.Title = this.MenuItems[position].Label;
                 this.DrawerLayout.CloseDrawer(this.DrawerList);
             }
         }

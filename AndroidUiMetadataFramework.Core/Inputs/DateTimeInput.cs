@@ -21,6 +21,7 @@
                 ScaleX = 0.5f,
                 ScaleY = 0.5f
             };
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("DatePicker", this.DateInput);
             return this.DateInput;
         }
 

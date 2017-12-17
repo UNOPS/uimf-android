@@ -19,7 +19,8 @@
 		{
 			var textValue = value.CastTObject<TextValue<object>>();
 			this.OutputText = new TextView(Application.Context) { Text = outputField.Label + ": " + textValue.Value };
-			return this.OutputText;
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", this.OutputText);
+            return this.OutputText;
 		}
 	}
 }

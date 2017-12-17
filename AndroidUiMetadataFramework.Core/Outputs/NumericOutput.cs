@@ -17,7 +17,8 @@
 		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
 			this.OutputText = new TextView(Application.Context);
-			if (value != null)
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", this.OutputText);
+            if (value != null)
 			{
 				this.OutputText.Text = outputField.Label + ": " + value;
 			}

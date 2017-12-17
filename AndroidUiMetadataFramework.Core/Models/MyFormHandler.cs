@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Android.App;
-    using Android.Graphics;
+    using Android.Support.V4.Widget;
     using Android.Views;
     using Android.Widget;
     using AndroidUiMetadataFramework.Core.Managers;
@@ -20,46 +20,31 @@
 
     public class MyFormHandler
     {
-        public MyFormHandler(Activity activity,
-            IMediator mediator,
+        public MyFormHandler(IMediator mediator,
             FormRegister formRegister,
-            InputManagerCollection inputManager,
-            OutputManagerCollection outputManager,
-            EventHandlerManagerCollection eventHandlerManager)
+            ManagersCollection managersCollection)
         {
-            this.EventHandlerManager = eventHandlerManager;
-            this.Activity = activity;
             this.Mediator = mediator;
-            this.InputManagerCollection = inputManager;
-            this.OutputManagerCollection = outputManager;
+            this.ManagersCollection = managersCollection ?? new ManagersCollection();
             this.FormRegister = formRegister;
         }
 
-        public MyFormHandler(Activity activity,
-            UiMetadataWebApi uiMetadataWebApi,
-            InputManagerCollection inputManager,
-            OutputManagerCollection outputManager,
-            EventHandlerManagerCollection eventHandlerManager,
+        public MyFormHandler(UiMetadataWebApi uiMetadataWebApi,
+            ManagersCollection managersCollection,
             IFormWrapper formWrapper,
             Dictionary<string, FormMetadata> allForms = null)
         {
-            this.EventHandlerManager = eventHandlerManager;
-            this.Activity = activity;
-            this.InputManagerCollection = inputManager;
-            this.OutputManagerCollection = outputManager;
+            this.ManagersCollection = managersCollection ?? new ManagersCollection();
             this.AllFormsMetadata = allForms;
             this.UiMetadataWebApi = uiMetadataWebApi;
             this.AppPreference = new AppSharedPreference(Application.Context);
             this.FormWrapper = formWrapper;
         }
 
-        public Activity Activity { get; }
         public Dictionary<string, FormMetadata> AllFormsMetadata { get; set; }
         public AppSharedPreference AppPreference { get; }
-        public EventHandlerManagerCollection EventHandlerManager { get; }
         public IFormWrapper FormWrapper { get; set; }
-        public InputManagerCollection InputManagerCollection { get; }
-        public OutputManagerCollection OutputManagerCollection { get; }
+        public ManagersCollection ManagersCollection { get; set; }
         public UiMetadataWebApi UiMetadataWebApi { get; }
         private FormRegister FormRegister { get; }
         private IMediator Mediator { get; }
@@ -161,7 +146,7 @@
             return response.Response;
         }
 
-        public void RenderInputs(LinearLayout layout, FormParameter formParameter, List<FormInputManager> inputsManager)
+        public void RenderInputs(LinearLayout inputsLayout, FormParameter formParameter, List<FormInputManager> inputsManager)
         {
             var orderedInputs = formParameter.Form.InputFields.OrderBy(a => a.OrderIndex).ToList();
             inputsManager.Clear();
@@ -170,13 +155,24 @@
             {
                 if (!input.Hidden)
                 {
-                    var label = new TextView(Application.Context) { Text = input.Label.Humanize(LetterCasing.Sentence) };
-                    layout.AddView(label, layout.MatchParentWrapContent());
+                    var label = new TextView(Application.Context)
+                    {
+                        Text = input.Label.Humanize(LetterCasing.Sentence),
+                        LayoutParameters = inputsLayout.MatchParentWrapContent()
+                    };
+
+                    this.ManagersCollection.StyleRegister.ApplyStyle("TextView", label);
+
+                    inputsLayout.AddView(label);
                 }
 
-                var manager = this.InputManagerCollection.GetManager(input.Type);
+                var manager = this.ManagersCollection.InputManagerCollection.GetManager(input.Type);
 
                 var view = manager.GetView(input.CustomProperties, this);
+                if (view.LayoutParameters == null)
+                {
+                    view.LayoutParameters = inputsLayout.MatchParentWrapContent();
+                }
                 var value = formParameter.Parameters?.SingleOrDefault(a => a.Key.ToLower().Equals(input.Id.ToLower())).Value;
                 if (value != null)
                 {
@@ -188,7 +184,7 @@
                 {
                     view.Visibility = ViewStates.Gone;
                 }
-                layout.AddView(view, layout.MatchParentWrapContent());
+                inputsLayout.AddView(view);
             }
         }
 
@@ -216,23 +212,28 @@
 
         private View RenderForm(FormParameter formParameter, string submitAction)
         {
-            var scroll = new ScrollView(Application.Context);
+            var scroll = new NestedScrollView(Application.Context);
             var linearLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
-            linearLayout.SetPadding(20, 10, 20, 10);
 
             if (formParameter != null)
             {
                 InvokeForm.Response result = null;
                 var inputsManager = new List<FormInputManager>();
-                var resultLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
-                resultLayout.SetPadding(20, 10, 20, 10);
+                var resultLayout = new LinearLayout(Application.Context)
+                {
+                    Orientation = Orientation.Vertical,
+                    LayoutParameters = linearLayout.MatchParentWrapContent()
+                };
 
                 if (formParameter.Form.InputFields.Count > 0)
                 {
-                    this.RenderInputs(linearLayout, formParameter, inputsManager);
+                    var inputsLayout = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
+
+                    this.RenderInputs(inputsLayout, formParameter, inputsManager);
 
                     if (formParameter.Form.InputFields.Count(a => !a.Hidden) > 0)
                     {
+                        this.ManagersCollection.StyleRegister.ApplyStyle("FormLayout", inputsLayout);
                         var submitLabel = "Submit";
                         var submitbuttonlabel = formParameter.Form.CustomProperties?.GetCustomProperty<string>("submitButtonLabel");
 
@@ -240,24 +241,35 @@
                         {
                             submitLabel = submitbuttonlabel;
                         }
-                        var btn = new Button(Application.Context) { Text = submitLabel };
-                        linearLayout.AddView(btn, linearLayout.MatchParentWrapContent());
-                        btn.SetBackgroundColor(new Color(22, 156, 133));
+                        var btn = new Button(Application.Context)
+                        {
+                            Text = submitLabel,
+                            LayoutParameters = inputsLayout.MatchParentWrapContent()
+                        };
+                        this.ManagersCollection.StyleRegister.ApplyStyle("Button SubmitButton", btn);
+                        inputsLayout.AddView(btn);
 
                         btn.Click += async (sender, args) =>
                         {
-                            result = await this.SubmitFormAsync(resultLayout, formParameter.Form, inputsManager);
-
-                            if (submitAction == FormLinkActions.OpenModal)
+                            try
                             {
-                                this.FormWrapper.CloseForm();
+                                result = await this.SubmitFormAsync(resultLayout, formParameter.Form, inputsManager);
+                                if (submitAction == FormLinkActions.OpenModal && result != null)
+                                {
+                                    this.FormWrapper.CloseForm();
+                                }
+                                else
+                                {
+                                    this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
+                                Toast.MakeText(Application.Context, ex.Message, ToastLength.Long).Show();
                             }
                         };
                     }
+                    linearLayout.AddView(inputsLayout);
                 }
                 // run on response handled events
                 EventsManager.OnFormLoadedEvent(formParameter);
@@ -284,7 +296,9 @@
                         this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
                     }
                 }
-                linearLayout.AddView(resultLayout, linearLayout.MatchParentWrapContent());
+                this.ManagersCollection.StyleRegister.ApplyStyle("ResultsLayout", resultLayout);
+
+                linearLayout.AddView(resultLayout);
                 scroll.AddView(linearLayout, scroll.MatchParentWrapContent());
             }
             return scroll;
@@ -321,10 +335,14 @@
                     }
                     if (value != null)
                     {
-                        var manager = this.OutputManagerCollection.GetManager(output.Type);
+                        var manager = this.ManagersCollection.OutputManagerCollection.GetManager(output.Type);
                         var view = manager.GetView(output, value, this, formMetadata, inputsManager);
                         view.SetPadding(0, 10, 0, 10);
-                        layout.AddView(view, layout.MatchParentWrapContent());
+                        if (view.LayoutParameters == null)
+                        {
+                            view.LayoutParameters = layout.MatchParentWrapContent();
+                        }
+                        layout.AddView(view);
                     }
                 }
             }
@@ -359,7 +377,7 @@
                     if (string.IsNullOrEmpty(value?.ToString()))
                     {
                         valid = false;
-                        inputManager.View.SetBackgroundResource(Resource.Drawable.ValidationBorders);
+                        this.ManagersCollection.StyleRegister.ApplyStyle("ValidationError", inputManager.View);
                     }
                 }
             }

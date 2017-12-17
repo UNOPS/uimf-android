@@ -29,7 +29,7 @@
                 var inputEvents = input.Input.EventHandlers.Where(e => e.RunAt.Equals(FormEvents.ResponseHandled));
                 foreach (var inputEvent in inputEvents)
                 {
-                    var manager = myFormHandler.EventHandlerManager.GetManager(inputEvent.Id);
+                    var manager = myFormHandler.ManagersCollection.EventHandlerManagerCollection.GetManager(inputEvent.Id);
                     manager.HandleEvent(inputEvent.CustomProperties, input, result);
                 }
             }

@@ -33,6 +33,17 @@
             return (T)obj;
         }
 
+        public static Context ContextThemeWrapper(this Context context, string styleName)
+        {
+            var resourceId = Application.Context.GetStyleResource(styleName);
+            if (resourceId != 0)
+            {
+                return new ContextThemeWrapper(Application.Context, resourceId);
+            }
+
+            return context;
+        }
+
         public static int ConvertPixelsToDp(this int pixelValue)
         {
             var dp = (int)(pixelValue / Application.Context.Resources.DisplayMetrics.Density);
@@ -65,6 +76,11 @@
             }
 
             return totalHeight;
+        }
+
+        public static int GetStyleResource(this Context context, string styleName)
+        {
+            return context.Resources.GetIdentifier(styleName, "style", context.PackageName);
         }
 
         public static IEnumerable<object> GetTypeaheadSource<T>(this object source,
@@ -104,7 +120,7 @@
                 catch (AggregateException ex)
                 {
                     ex.ThrowInnerException();
-                }              
+                }
             }
             return new List<object>();
         }
@@ -112,9 +128,7 @@
         public static ListView IntializeListView(this IList<object> itemList, OutputFieldMetadata outputField, MyFormHandler myFormHandler)
         {
             var listView = new ListView(Application.Context);
-            listView.SetPadding(10, 0, 10, 0);
             var outputFieldProperty = outputField.CustomProperties.GetCustomProperty<IEnumerable<OutputFieldMetadata>>("columns");
-            listView.FastScrollEnabled = true;
             var adapter = new ListCustomAdapter<object>(itemList.ToList(), outputFieldProperty, myFormHandler);
             listView.Adapter = adapter;
             return listView;
@@ -123,6 +137,12 @@
         public static LinearLayout.LayoutParams MatchParentWrapContent(this View view)
         {
             return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent,
+                ViewGroup.LayoutParams.WrapContent);
+        }
+
+        public static LinearLayout.LayoutParams WrapContent(this View view)
+        {
+            return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent,
                 ViewGroup.LayoutParams.WrapContent);
         }
 

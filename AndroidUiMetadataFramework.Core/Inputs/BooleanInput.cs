@@ -16,6 +16,7 @@
 		public View GetView(IDictionary<string, object> inputCustomProperties, MyFormHandler myFormHandler)
 		{
 			this.InputBoolean = new CheckBox(Application.Context);
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("CheckBox", this.InputBoolean);
 			return this.InputBoolean;
 		}
 

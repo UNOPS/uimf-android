@@ -7,13 +7,14 @@
     using AndroidUiMetadataFramework.Core.Attributes;
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
+    using Com.Google.Android.Flexbox;
     using UiMetadataFramework.Basic.Output;
     using UiMetadataFramework.Core;
 
     [Output(Type = "action-list")]
     public class ActionListOutput : IOutputManager
     {
-        private LinearLayout OutputView { get; set; }
+        private FlexboxLayout OutputView { get; set; }
 
         public View GetView(OutputFieldMetadata outputField,
             object value,
@@ -21,10 +22,7 @@
             FormMetadata formMetadata,
             List<FormInputManager> inputsManager)
         {
-            this.OutputView = new LinearLayout(Application.Context)
-            {
-                Orientation = Orientation.Vertical
-            };
+            this.OutputView = new FlexboxLayout(Application.Context);
             var actions = value.CastTObject<ActionList>();
 
             if (actions != null)
@@ -32,7 +30,11 @@
                 foreach (var btn in actions.Actions)
                 {
                     var button = this.InitializeActionButton(btn, myFormHandler);
-                    this.OutputView.AddView(button, this.OutputView.MatchParentWrapContent());
+ 
+                    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("Button", button);
+                    this.OutputView.AddView(button);
+                    this.OutputView.FlexDirection = FlexboxLayout.FlexDirectionRow;
+                    this.OutputView.FlexWrap = FlexboxLayout.FlexWrapWrap;
                 }
             }
 
@@ -42,7 +44,7 @@
         public Button InitializeActionButton(FormLink btn, MyFormHandler myFormHandler)
         {
             var button = new Button(Application.Context) { Text = btn.Label };
-            button.SetAllCaps(false);
+
             button.Click += async (sender, args) =>
             {
                 var formMetadata = myFormHandler.GetFormMetadata(btn.Form);

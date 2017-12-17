@@ -44,7 +44,6 @@
 
         public static async Task<FormMetadata> GetFormMetadata(string formId, string url, string requestCookies)
         {
-            FormMetadata formResponse;
             var cookies = new CookieContainer();
             var handler = new HttpClientHandler { CookieContainer = cookies };
             var address = new Uri(url + "/" + formId);
@@ -64,16 +63,12 @@
                 var data = await ReadResponseContent(response);
                 if (response.IsSuccessStatusCode)
                 {
-                    formResponse = JsonConvert.DeserializeObject<FormMetadata>(data);
+                    var formResponse = JsonConvert.DeserializeObject<FormMetadata>(data);
+                    return formResponse;
                 }
-                else
-                {
-                    var exception = JsonConvert.DeserializeObject<HttpException>(data);
-                    throw new Exception(exception.Error);
-                }
+                var exception = JsonConvert.DeserializeObject<HttpException>(data);
+                throw new Exception(exception.Error);
             }
-
-            return formResponse;
         }
 
         public static async Task<InvokeFormResponse> InvokeForm(string url, string requestCookies, object param = null)

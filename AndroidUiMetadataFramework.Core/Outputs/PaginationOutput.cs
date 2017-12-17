@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Android.App;
-    using Android.Graphics;
     using Android.Views;
     using Android.Widget;
     using AndroidUiMetadataFramework.Core.Attributes;
@@ -30,8 +29,13 @@
             List<FormInputManager> inputsManager)
         {
             this.OutputList = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
-            var label = new TextView(Application.Context) { Text = outputField.Label };
-            this.OutputList.AddView(label, this.OutputList.MatchParentWrapContent());
+            if (!string.IsNullOrEmpty(outputField.Label))
+            {
+                var label = new TextView(Application.Context) { Text = outputField.Label + ": " };
+                this.OutputList.AddView(label, this.OutputList.MatchParentWrapContent());
+                myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", label);
+            }
+
             var paginatedData = value.CastTObject<PaginatedData<object>>();
             this.ItemList = paginatedData.Results.ToList();
             this.TotalCount = paginatedData.TotalCount;
@@ -44,20 +48,24 @@
                 {
                     var btnLoadMore = this.CreateLoadMoreButton(myFormHandler, formMetadata, outputField, listView, inputsManager,
                         myFormHandler.AllFormsMetadata);
+                    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("Button Link LoadMore", btnLoadMore);
                     listView.AddFooterView(btnLoadMore);
                 }
             }
-
-            var param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, listView.GetListHeigth());
-            this.OutputList.AddView(listView, param);
+            
             if (this.ItemList.Count == 0)
             {
                 var noResult = new TextView(Application.Context)
                 {
                     Text = "no data."
                 };
-                this.OutputList.AddView(noResult, this.OutputList.MatchParentWrapContent());
+                noResult.LayoutParameters = noResult.WrapContent();
+                myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView NoResult", noResult);
+                this.OutputList.AddView(noResult);
             }
+            listView.LayoutParameters = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, listView.GetListHeigth());
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("ListView", listView);
+            this.OutputList.AddView(listView);
             return this.OutputList;
         }
 
@@ -69,9 +77,6 @@
             Dictionary<string, FormMetadata> allFormsMetadata)
         {
             var btnLoadMore = new Button(Application.Context) { Text = "Load More" };
-            btnLoadMore.SetTextColor(Color.LightBlue);
-            btnLoadMore.SetBackgroundColor(Color.Transparent);
-            btnLoadMore.SetAllCaps(false);
             btnLoadMore.Click += async (sender, args) =>
             {
                 this.PageIndex++;

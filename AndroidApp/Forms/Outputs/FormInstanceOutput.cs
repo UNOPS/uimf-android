@@ -22,12 +22,16 @@
         {
             this.OutputView = new LinearLayout(Application.Context) { Orientation = Orientation.Vertical };
             var label = new TextView(Application.Context) { Text = outputField.Label };
-            this.OutputView.AddView(label, this.OutputView.MatchParentWrapContent());
+            label.LayoutParameters = label.WrapContent();
+            myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", label);
+            this.OutputView.AddView(label);
             var formInstance = value.CastTObject<FormInstanceModel>();
             foreach (var formInstanceValue in formInstance.Values)
             {
                 var textView = new TextView(Application.Context) { Text = formInstanceValue.Label + ": " + formInstanceValue.Value };
-                this.OutputView.AddView(textView, this.OutputView.MatchParentWrapContent());
+                textView.LayoutParameters = textView.WrapContent();
+                myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", textView);
+                this.OutputView.AddView(textView);
             }
             return this.OutputView;
         }

@@ -25,7 +25,8 @@
 			{
 				Text = outputField.Label + ": " + string.Join(", ", list)
 			};
-			return this.OutputText;
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", this.OutputText);
+            return this.OutputText;
 		}
 	}
 

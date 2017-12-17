@@ -11,7 +11,11 @@ AndroidApp/Resources/Resource\.Designer\.cs
 AndroidUiMetadataFramework.Core/obj/
 AndroidUiMetadataFramework.Core/bin/
 AndroidUiMetadataFramework.Core/Resources/Resource.Designer.cs
+<<<<<<< 28ddac881e4ce18048e4a2332872ab5f1e607d48
 
 AndroidApp/AndroidApp\.csproj\.user
 
 AndroidUiMetadateFramework\.Core/Resources/Resource\.Designer\.cs
+App.Style/obj/
+App.Style/bin/
+

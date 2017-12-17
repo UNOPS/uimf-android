@@ -24,7 +24,7 @@
 	[Activity(Label = "My Magic App", MainLauncher = false, Icon = "@drawable/icon", Theme = "@style/Theme.AppCompat")]
 	public class MainActivityWithoutApi : AppCompatActivity, View.IOnClickListener
 	{
-		public  List<MyFormWrapper> AppLayouts = new List<MyFormWrapper>();
+		public  List<MyFormFragment> AppLayouts = new List<MyFormFragment>();
 		private Container Container { get;} = new Container();
 		private Button Btn { get; set; }
 		private MyFormHandler MyFormHandler { get; set; }
@@ -80,8 +80,7 @@
 			this.RegisterManagers();
 			this.ConfigureContainer();
 			this.FormRegister = this.Container.GetInstance<FormRegister>();
-			this.MyFormHandler = new MyFormHandler(this, this.Container.GetInstance<IMediator>(), this.FormRegister, this.InputManager, this.OutputManager,
-				this.EventManager);
+			this.MyFormHandler = new MyFormHandler(this.Container.GetInstance<IMediator>(), this.FormRegister, new ManagersCollection());
 			this.Btn = this.FindViewById<Button>(Resource.Id.button1);
 			this.Btn.SetOnClickListener(this);
 		}

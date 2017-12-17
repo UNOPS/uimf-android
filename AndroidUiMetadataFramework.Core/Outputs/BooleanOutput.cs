@@ -16,8 +16,12 @@
 
 		public View GetView(OutputFieldMetadata outputField, object value, MyFormHandler myFormHandler, FormMetadata formMetadata, List<FormInputManager> inputsManager)
 		{
-			this.OutputText = new TextView(Application.Context) { Text = outputField.Label + ": " + value };
-			return this.OutputText;
+			this.OutputText = new TextView(Application.Context)
+			{
+			    Text = outputField.Label + ": " + value
+			};
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView", this.OutputText);
+            return this.OutputText;
 		}
 	}
 }

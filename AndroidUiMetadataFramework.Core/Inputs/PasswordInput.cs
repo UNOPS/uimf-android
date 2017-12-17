@@ -21,7 +21,8 @@
 			{
 				InputType = InputTypes.TextVariationPassword | InputTypes.ClassText
 			};
-			return this.InputText;
+		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("EditText", this.InputText);
+            return this.InputText;
 		}
 
 		public object GetValue()

@@ -34,7 +34,7 @@
 			var vi = LayoutInflater.From(parent.Context);
 			var v = vi.Inflate(Resource.Layout.drawer_list_item, parent, false);
 			var tv = v.FindViewById<TextView>(Android.Resource.Id.Text1);
-		    tv.SetTextColor(this.Dataset[viewType].FormMetadata != null ? Color.Blue : Color.Black);
+		    tv.SetTextColor(this.Dataset[viewType].FormMetadata != null ? Color.ParseColor("#cccccc") : Color.ParseColor("#17a2b8"));
 
 		    return new ViewHolder(tv);
 		}
