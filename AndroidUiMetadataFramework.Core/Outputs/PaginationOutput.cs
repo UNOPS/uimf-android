@@ -59,7 +59,7 @@
                 {
                     Text = "no data."
                 };
-                noResult.LayoutParameters = noResult.WrapContent();
+                noResult.LayoutParameters = noResult.MatchParentWrapContent();
                 myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("TextView NoResult", noResult);
                 this.OutputList.AddView(noResult);
             }

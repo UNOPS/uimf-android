@@ -39,7 +39,7 @@
             return this.RootView ?? (this.RootView = new LinearLayout(Application.Context));
         }
 
-        public void UpdateFragment(int resId)
+        public void UpdateFragment()
         {
             if (this.MyFormHandler != null)
             {
@@ -61,10 +61,9 @@
                     return;
                 }
             }
-
             var fragmentManager = this.OwnerActivity.FragmentManager;
             var ft = fragmentManager.BeginTransaction();
-            ft.Replace(resId, this);
+            ft.Replace(Resource.Id.content_frame, this);
             ft.Commit();
             this.OwnerActivity.Title = this.FormParameter?.Form == null ? "GMS" : this.FormParameter.Form?.Label;
         }

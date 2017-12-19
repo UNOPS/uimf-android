@@ -11,7 +11,16 @@
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFF" />
+            android:background="#FFF">
+          <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/progress_bar"
+            android:layout_gravity="center_vertical|center_horizontal" />
+        </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/left_drawer"
@@ -20,6 +29,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="left|start"
         android:choiceMode="singleChoice"
-        android:listDivider="@color/pink"/>
-  
+        android:listDivider="@color/pink" />
 </android.support.v4.widget.DrawerLayout>

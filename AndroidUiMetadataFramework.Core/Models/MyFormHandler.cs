@@ -290,11 +290,9 @@
                     if (submitAction == FormLinkActions.Run)
                     {
                         this.FormWrapper.CloseForm();
+                        return null;
                     }
-                    else
-                    {
-                        this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
-                    }
+                    this.RenderOutput(resultLayout, result, formParameter.Form, inputsManager);
                 }
                 this.ManagersCollection.StyleRegister.ApplyStyle("ResultsLayout", resultLayout);
 

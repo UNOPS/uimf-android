@@ -32,14 +32,16 @@
     public class FormsActivity : AppCompatActivity, DrawerListAdapter.IOnItemClickListener
     {
         public List<MyFormFragment> AppLayouts = new List<MyFormFragment>();
-        public ManagersCollection ManagersCollection { get; set; }
 
         public CustomFormWrapper FormWrapper { get; set; }
-        private Dictionary<string, FormMetadata> AllForms { get; set; }
+        public Handler Handler { get; } = new Handler();
+        public ManagersCollection ManagersCollection { get; set; }
+        public ProgressBar ProgressBar { get; set; }
+        private Dictionary<string, FormMetadata> AllForms { get; set; } = new Dictionary<string, FormMetadata>();
         private DrawerLayout DrawerLayout { get; set; }
         private RecyclerView DrawerList { get; set; }
         private ActionBarDrawerToggle DrawerToggle { get; set; }
-        private List<MenuItem> MenuItems { get; set; }
+        private List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
         private MyFormHandler MyFormHandler { get; set; }
         private UiMetadataWebApi UiMetadataWebApi { get; set; }
 
@@ -49,109 +51,35 @@
             this.SelectItem(position);
         }
 
-        public override void OnBackPressed()
+        public void FetchMetadata()
         {
-            this.AppLayouts.RemoveAt(this.AppLayouts.Count - 1);
-            if (this.AppLayouts.Count != 0)
+            new Thread(new Runnable(() =>
             {
-                this.AppLayouts[this.AppLayouts.Count - 1].UpdateFragment(Resource.Id.content_frame);
-            }
-            else
-            {
-                this.Finish();
-            }
+                this.ProgressBar.Visibility = ViewStates.Visible;
+                this.GetAllFormsMetadata();
+                this.RunOnUiThread(this.RefreshDrawerList);
+
+                this.Handler.Post(() => { this.ProgressBar.Visibility = ViewStates.Invisible; });
+            })).Start();
         }
 
-        public override void OnConfigurationChanged(Configuration newConfig)
-        {
-            base.OnConfigurationChanged(newConfig);
-            // Pass any configuration change to the drawer toggls
-            this.DrawerToggle.OnConfigurationChanged(newConfig);
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (this.DrawerToggle.OnOptionsItemSelected(item))
-            {
-                return true;
-            }
-            return base.OnOptionsItemSelected(item);
-        }
-
-        public Dictionary<string, FormMetadata> Reload()
-        {
-            this.GetAllFormsMetadata();
-            this.MyFormHandler.AllFormsMetadata = new Dictionary<string, FormMetadata>();
-            foreach (var item in this.AllForms)
-            {
-                this.MyFormHandler.AllFormsMetadata.Add(item.Key, item.Value);
-            }
-            this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
-            this.DrawerList.GetAdapter().NotifyDataSetChanged();
-            return this.AllForms;
-        }
-
-        protected override void OnCreate(Bundle bundle)
-        {
-            base.OnCreate(bundle);
-            this.SetContentView(Resource.Layout.Magic);
-            this.UiMetadataWebApi = new UiMetadataWebApi
-            {
-                FormMetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
-                MetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
-                RunFormUrl = "http://10.0.2.2:58337/api/form/run"
-            };
-            this.RegisterManagers();
-            this.GetAllFormsMetadata();
-
-            this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts, Resource.Id.content_frame);
-            
-            this.MyFormHandler = new MyFormHandler(this.UiMetadataWebApi,this.ManagersCollection,this.FormWrapper, this.AllForms);
-            this.InitializeDrawerLayout();
-            if (this.AppLayouts.Count == 0)
-            {
-                this.AppLayouts.Add(new MyFormFragment(this));
-            }
-
-            var refresher = this.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
-            refresher.SetColorScheme(Resource.Color.blue,
-                Resource.Color.white,
-                Resource.Color.pink,
-                Resource.Color.black);
-            refresher.Refresh += delegate
-            {
-                var wrapper = this.AppLayouts[this.AppLayouts.Count - 1];
-                var fragment = new MyFormFragment(wrapper.FormParameter, wrapper.MyFormHandler, this, wrapper.SubmitAction);
-                fragment.UpdateFragment(Resource.Id.content_frame);
-                refresher.Refreshing = false;
-            };
-        }
-
-        protected override void OnPostCreate(Bundle savedInstanceState)
-        {
-            base.OnPostCreate(savedInstanceState);
-            // Sync the toggle state after onRestoreInstanceState has occurred.
-            this.DrawerToggle.SyncState();
-        }
-
-        protected override void OnTitleChanged(ICharSequence title, Color color)
-        {
-            this.SupportActionBar.Title = title?.ToString();
-        }
-
-        private void GetAllFormsMetadata()
+        public void GetAllFormsMetadata()
         {
             this.AllForms = new Dictionary<string, FormMetadata>();
             var appPreference = new AppSharedPreference(Application.Context);
             this.MenuItems = new List<MenuItem>();
+            this.MyFormHandler.AllFormsMetadata = new Dictionary<string, FormMetadata>();
+
             try
             {
                 var result = Task.Run(
-                    () => UiMetadataHttpRequestHelper.GetAllFormsMetadata(this.UiMetadataWebApi.MetadataUrl, appPreference.GetSharedKey("Cookies")));
+                    () => UiMetadataHttpRequestHelper.GetAllFormsMetadata(this.UiMetadataWebApi.MetadataUrl,
+                        appPreference.GetSharedKey("Cookies")));
                 var metadata = JsonConvert.DeserializeObject<MyForms>(result.Result);
                 var orderedMenu = metadata.Menus.OrderBy(a => a.OrderIndex);
                 var orderedForms = metadata.Forms
-                    .OrderBy(a => a.CustomProperties != null ? a.CustomProperties?.GetCustomProperty<long>("menuOrderIndex") : 0);
+                    .OrderBy(a => a.CustomProperties != null ? a.CustomProperties?.GetCustomProperty<long>("menuOrderIndex") : 0)
+                    .ToList();
                 foreach (var menuItem in orderedMenu)
                 {
                     var existingForms = false;
@@ -177,16 +105,21 @@
                         {
                             this.AllForms.Add(form.Id, form);
                         }
+
+                        if (!this.MyFormHandler.AllFormsMetadata.ContainsKey(form.Id))
+                        {
+                            this.MyFormHandler.AllFormsMetadata.Add(form.Id, form);
+                        }
                     }
                 }
             }
             catch (System.Exception)
             {
-                Toast.MakeText(Application.Context, "Server is not available in this moment", ToastLength.Long).Show();
+                this.RunOnUiThread(() => { Toast.MakeText(Application.Context, "Server is not available in this moment", ToastLength.Long).Show(); });
             }
         }
 
-        private void InitializeDrawerLayout()
+        public void InitializeDrawerLayout()
         {
             this.DrawerLayout = this.FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
             this.DrawerList = this.FindViewById<RecyclerView>(Resource.Id.left_drawer);
@@ -205,7 +138,99 @@
                 Resource.String.drawer_close,
                 this.Title);
 
-            this.DrawerLayout.SetDrawerListener(this.DrawerToggle);
+            this.DrawerLayout.AddDrawerListener(this.DrawerToggle);
+        }
+
+        public override void OnBackPressed()
+        {
+            this.AppLayouts.RemoveAt(this.AppLayouts.Count - 1);
+            if (this.AppLayouts.Count != 0)
+            {
+                this.AppLayouts[this.AppLayouts.Count - 1].UpdateFragment();
+            }
+            else
+            {
+                this.Finish();
+            }
+        }
+
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+            // Pass any configuration change to the drawer toggls
+            this.DrawerToggle.OnConfigurationChanged(newConfig);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            if (this.DrawerToggle.OnOptionsItemSelected(item))
+            {
+                return true;
+            }
+            return base.OnOptionsItemSelected(item);
+        }
+
+        public void RefreshDrawerList()
+        {
+            this.DrawerList.SetAdapter(new DrawerListAdapter(this.MenuItems, this));
+            this.DrawerList.GetAdapter().NotifyDataSetChanged();
+        }
+
+        public Dictionary<string, FormMetadata> Reload()
+        {
+            this.GetAllFormsMetadata();
+            this.RefreshDrawerList();
+            return this.AllForms;
+        }
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            this.SetContentView(Resource.Layout.Magic);
+            this.UiMetadataWebApi = new UiMetadataWebApi
+            {
+                FormMetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+                MetadataUrl = "http://10.0.2.2:58337/api/form/metadata",
+                RunFormUrl = "http://10.0.2.2:58337/api/form/run"
+            };
+            this.RegisterManagers();
+            this.ProgressBar = this.FindViewById<ProgressBar>(Resource.Id.progressBar);
+            this.FormWrapper = new CustomFormWrapper(this, this.AppLayouts);
+            this.MyFormHandler = new MyFormHandler(this.UiMetadataWebApi, this.ManagersCollection, this.FormWrapper, this.AllForms);
+            this.InitializeDrawerLayout();
+            if (this.AppLayouts.Count == 0)
+            {
+                this.AppLayouts.Add(new MyFormFragment(this));
+            }
+
+            var refresher = this.FindViewById<SwipeRefreshLayout>(Resource.Id.refresher);
+#pragma warning disable 618
+            refresher.SetColorScheme(Resource.Color.blue);
+#pragma warning restore 618
+            refresher.Refresh += delegate
+            {
+                this.GetAllFormsMetadata();
+                this.RefreshDrawerList();
+                var wrapper = this.AppLayouts[this.AppLayouts.Count - 1];
+                this.FormWrapper.UpdateView(wrapper.MyFormHandler, wrapper.FormParameter, wrapper.SubmitAction);
+                this.AppLayouts.RemoveAt(this.AppLayouts.Count - 1);
+
+                refresher.Refreshing = false;
+            };
+
+            this.FetchMetadata();
+        }
+
+        protected override void OnPostCreate(Bundle savedInstanceState)
+        {
+            base.OnPostCreate(savedInstanceState);
+            // Sync the toggle state after onRestoreInstanceState has occurred.
+            this.DrawerToggle.SyncState();
+        }
+
+        protected override void OnTitleChanged(ICharSequence title, Color color)
+        {
+            this.SupportActionBar.Title = title?.ToString();
         }
 
         private void RegisterManagers()
@@ -223,7 +248,7 @@
 
             var styleRegister = new StyleRegister();
             styleRegister.RegisterAssembly(typeof(TextViewStyle).Assembly);
-            this.ManagersCollection = new ManagersCollection()
+            this.ManagersCollection = new ManagersCollection
             {
                 InputManagerCollection = inputManager,
                 OutputManagerCollection = outputManager,
@@ -236,9 +261,9 @@
         {
             if (this.MenuItems[position].FormMetadata != null)
             {
-                this.FormWrapper.UpdateView(this.MyFormHandler, new FormParameter(this.MenuItems[position].FormMetadata));
                 // update selected item title, then close the drawer
                 this.DrawerLayout.CloseDrawer(this.DrawerList);
+                this.FormWrapper.UpdateView(this.MyFormHandler, new FormParameter(this.MenuItems[position].FormMetadata));
             }
         }
     }

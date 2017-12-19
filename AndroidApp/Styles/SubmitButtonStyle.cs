@@ -14,7 +14,8 @@
             {
                 btn.Background.SetColorFilter(Color.ParseColor(AppColors.Blue), PorterDuff.Mode.SrcAtop);
                 btn.SetTextColor(Color.White);
-
+                btn.SetPadding(20, 25, 20, 25);
+                btn.TextSize = 14;
                 var layoutParams = btn.MatchParentWrapContent();
                 btn.LayoutParameters = layoutParams;
             }
