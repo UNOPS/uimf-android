@@ -9,8 +9,9 @@
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
     using UiMetadataFramework.Basic.Input.Typeahead;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "typeahead")]
+	[Input(Type = "typeahead")]
     public class TypeaheadInput : IInputManager
     {
         private AutoCompleteTextView InputText { get; set; }
@@ -47,7 +48,12 @@
             return this.InputText;
         }
 
-        public object GetValue()
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+		}
+
+		public object GetValue()
         {
             if (!string.IsNullOrEmpty(this.InputText.Text))
             {

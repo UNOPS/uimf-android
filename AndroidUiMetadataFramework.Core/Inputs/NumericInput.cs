@@ -9,8 +9,9 @@
 	using AndroidUiMetadataFramework.Core.Attributes;
 	using AndroidUiMetadataFramework.Core.Managers;
 	using AndroidUiMetadataFramework.Core.Models;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "number")]
+	[Input(Type = "number")]
 	public class NumericInput : IInputManager
 	{
 		private EditText InputText { get; set; }
@@ -29,6 +30,11 @@
 				return Convert.ToInt32(this.InputText.Text);
 			}
 			return null;
+		}
+
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
 		}
 
 		public void SetValue(object value)

@@ -17,7 +17,7 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -47,6 +47,9 @@
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FlexboxLayoutXamarinBindingAndroid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FlexboxLayoutXamarinBindingAndroid.1.0.2\lib\monoandroid71\FlexboxLayoutXamarinBindingAndroid.dll</HintPath>
+    </Reference>
     <Reference Include="Humanizer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
       <HintPath>..\packages\Humanizer.Core.2.2.0\lib\netstandard1.0\Humanizer.dll</HintPath>
     </Reference>
@@ -138,6 +141,22 @@
     <Compile Include="Forms\MyFormFragment.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Styles\ListViewItemStyle.cs" />
+    <Compile Include="Styles\ResultsLayoutStyle.cs" />
+    <Compile Include="Styles\FormLayoutStyle.cs" />
+    <Compile Include="Styles\ValidationErrorStyle.cs" />
+    <Compile Include="Styles\ButtonStyle.cs" />
+    <Compile Include="Styles\CheckBoxStyle.cs" />
+    <Compile Include="Styles\AppColors.cs" />
+    <Compile Include="Styles\CurrentTabStyle.cs" />
+    <Compile Include="Styles\EditTextStyle.cs" />
+    <Compile Include="Styles\LinkStyle.cs" />
+    <Compile Include="Styles\ListViewStyle.cs" />
+    <Compile Include="Styles\SpinnerStyle.cs" />
+    <Compile Include="Styles\SubmitButtonStyle.cs" />
+    <Compile Include="Styles\TabStyle.cs" />
+    <Compile Include="Styles\SpinnerItemStyle.cs" />
+    <Compile Include="Styles\TextViewStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GettingStarted.Xamarin" />
@@ -175,7 +194,7 @@
       <Name>App.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\App.Style\App.Style.csproj">
-      <Project>{a7ce20ee-afea-4048-b552-50edbbeb2d73}</Project>
+      <Project>{720240ba-9491-44e4-a583-ae75db33eaeb}</Project>
       <Name>App.Style</Name>
     </ProjectReference>
   </ItemGroup>
@@ -194,15 +213,22 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\values\main-style.xml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\current_tab_border.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\button_bg.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\ValidationBorders.xml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\tab_border.xml" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\list_style.xml" />
+    <AndroidResource Include="Resources\drawable\list_bg.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\progress_bar.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

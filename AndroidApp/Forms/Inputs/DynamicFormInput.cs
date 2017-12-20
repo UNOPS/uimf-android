@@ -10,8 +10,9 @@
     using AndroidUiMetadataFramework.Core.Models;
     using Humanizer;
     using UiMetadataFramework.Basic.Input;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "dynamic-form")]
+	[Input(Type = "dynamic-form")]
     public class DynamicFormInput : IInputManager
     {
         public MyFormHandler FormHandler { get; set; }
@@ -28,7 +29,12 @@
             return this.Layout;
         }
 
-        public object GetValue()
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+		}
+
+		public object GetValue()
         {
             if (this.InputsManager == null)
             {

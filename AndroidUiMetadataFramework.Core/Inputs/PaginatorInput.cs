@@ -10,8 +10,9 @@
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
     using UiMetadataFramework.Basic.Input;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "paginator")]
+	[Input(Type = "paginator")]
     public class PaginatorInput : IInputManager
     {
         private EditText Ascending { get; set; }
@@ -34,7 +35,12 @@
             return this.InputPaginator;
         }
 
-        public object GetValue()
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return true;
+		}
+
+		public object GetValue()
         {
             return new Paginator
             {

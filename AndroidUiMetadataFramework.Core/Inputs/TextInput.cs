@@ -8,8 +8,9 @@
 	using AndroidUiMetadataFramework.Core.Attributes;
 	using AndroidUiMetadataFramework.Core.Managers;
 	using AndroidUiMetadataFramework.Core.Models;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "text")]
+	[Input(Type = "text")]
 	public class TextInput : IInputManager
 	{
 		private EditText InputText { get; set; }
@@ -24,6 +25,11 @@
 		public object GetValue()
 		{
 			return this.InputText.Text;
+		}
+
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
 		}
 
 		public void SetValue(object value)

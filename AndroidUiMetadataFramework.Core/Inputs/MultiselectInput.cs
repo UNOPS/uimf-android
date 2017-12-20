@@ -9,8 +9,9 @@
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
     using UiMetadataFramework.Basic.Input.Typeahead;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "multiselect")]
+	[Input(Type = "multiselect")]
     public class MultiselectInput : IInputManager
     {
         private MultiAutoCompleteTextView InputText { get; set; }
@@ -48,7 +49,12 @@
             return this.InputText;
         }
 
-        public object GetValue()
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+		}
+
+		public object GetValue()
         {
             var items = this.InputText.Text.Split(',');
             var selectedItems = this.ItemsList.Where(a => items.Contains(a.Label)).Select(a => a.Value);

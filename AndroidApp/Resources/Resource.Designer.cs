@@ -701,7 +701,13 @@ namespace AndroidApp
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.abc_textfield_search_material = global::AndroidApp.Resource.Drawable.abc_textfield_search_material;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.abc_vector_test = global::AndroidApp.Resource.Drawable.abc_vector_test;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_hide_password = global::AndroidApp.Resource.Drawable.avd_hide_password;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_hide_password_1 = global::AndroidApp.Resource.Drawable.avd_hide_password_1;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_hide_password_2 = global::AndroidApp.Resource.Drawable.avd_hide_password_2;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_hide_password_3 = global::AndroidApp.Resource.Drawable.avd_hide_password_3;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_show_password = global::AndroidApp.Resource.Drawable.avd_show_password;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_show_password_1 = global::AndroidApp.Resource.Drawable.avd_show_password_1;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_show_password_2 = global::AndroidApp.Resource.Drawable.avd_show_password_2;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.avd_show_password_3 = global::AndroidApp.Resource.Drawable.avd_show_password_3;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.design_bottom_navigation_item_background = global::AndroidApp.Resource.Drawable.design_bottom_navigation_item_background;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.design_fab_background = global::AndroidApp.Resource.Drawable.design_fab_background;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.design_ic_visibility = global::AndroidApp.Resource.Drawable.design_ic_visibility;
@@ -721,6 +727,7 @@ namespace AndroidApp
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.notification_template_icon_low_bg = global::AndroidApp.Resource.Drawable.notification_template_icon_low_bg;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.notification_tile_bg = global::AndroidApp.Resource.Drawable.notification_tile_bg;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.notify_panel_notification_icon_bg = global::AndroidApp.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::AndroidUiMetadataFramework.Core.Resource.Drawable.TabBorders = global::AndroidApp.Resource.Drawable.TabBorders;
 			global::AndroidUiMetadataFramework.Core.Resource.Drawable.ValidationBorders = global::AndroidApp.Resource.Drawable.ValidationBorders;
 			global::AndroidUiMetadataFramework.Core.Resource.Id.action0 = global::AndroidApp.Resource.Id.action0;
 			global::AndroidUiMetadataFramework.Core.Resource.Id.action_bar = global::AndroidApp.Resource.Id.action_bar;
@@ -955,6 +962,7 @@ namespace AndroidApp
 			global::AndroidUiMetadataFramework.Core.Resource.Layout.select_dialog_item_material = global::AndroidApp.Resource.Layout.select_dialog_item_material;
 			global::AndroidUiMetadataFramework.Core.Resource.Layout.select_dialog_multichoice_material = global::AndroidApp.Resource.Layout.select_dialog_multichoice_material;
 			global::AndroidUiMetadataFramework.Core.Resource.Layout.select_dialog_singlechoice_material = global::AndroidApp.Resource.Layout.select_dialog_singlechoice_material;
+			global::AndroidUiMetadataFramework.Core.Resource.Layout.spinner_item = global::AndroidApp.Resource.Layout.spinner_item;
 			global::AndroidUiMetadataFramework.Core.Resource.Layout.support_simple_spinner_dropdown_item = global::AndroidApp.Resource.Layout.support_simple_spinner_dropdown_item;
 			global::AndroidUiMetadataFramework.Core.Resource.String.ApplicationName = global::AndroidApp.Resource.String.ApplicationName;
 			global::AndroidUiMetadataFramework.Core.Resource.String.Hello = global::AndroidApp.Resource.String.Hello;
@@ -4041,8 +4049,26 @@ namespace AndroidApp
 			// aapt resource value: 0x7f020053
 			public const int avd_hide_password = 2130837587;
 			
+			// aapt resource value: 0x7f020071
+			public const int avd_hide_password_1 = 2130837617;
+			
+			// aapt resource value: 0x7f020072
+			public const int avd_hide_password_2 = 2130837618;
+			
+			// aapt resource value: 0x7f020073
+			public const int avd_hide_password_3 = 2130837619;
+			
 			// aapt resource value: 0x7f020054
 			public const int avd_show_password = 2130837588;
+			
+			// aapt resource value: 0x7f020074
+			public const int avd_show_password_1 = 2130837620;
+			
+			// aapt resource value: 0x7f020075
+			public const int avd_show_password_2 = 2130837621;
+			
+			// aapt resource value: 0x7f020076
+			public const int avd_show_password_3 = 2130837622;
 			
 			// aapt resource value: 0x7f020055
 			public const int button_bg = 2130837589;
@@ -4104,11 +4130,11 @@ namespace AndroidApp
 			// aapt resource value: 0x7f020068
 			public const int notification_icon_background = 2130837608;
 			
-			// aapt resource value: 0x7f02006e
-			public const int notification_template_icon_bg = 2130837614;
-			
 			// aapt resource value: 0x7f02006f
-			public const int notification_template_icon_low_bg = 2130837615;
+			public const int notification_template_icon_bg = 2130837615;
+			
+			// aapt resource value: 0x7f020070
+			public const int notification_template_icon_low_bg = 2130837616;
 			
 			// aapt resource value: 0x7f020069
 			public const int notification_tile_bg = 2130837609;
@@ -4123,7 +4149,10 @@ namespace AndroidApp
 			public const int tab_border = 2130837612;
 			
 			// aapt resource value: 0x7f02006d
-			public const int ValidationBorders = 2130837613;
+			public const int TabBorders = 2130837613;
+			
+			// aapt resource value: 0x7f02006e
+			public const int ValidationBorders = 2130837614;
 			
 			static Drawable()
 			{
@@ -4894,7 +4923,10 @@ namespace AndroidApp
 			public const int select_dialog_singlechoice_material = 2130903101;
 			
 			// aapt resource value: 0x7f03003e
-			public const int support_simple_spinner_dropdown_item = 2130903102;
+			public const int spinner_item = 2130903102;
+			
+			// aapt resource value: 0x7f03003f
+			public const int support_simple_spinner_dropdown_item = 2130903103;
 			
 			static Layout()
 			{

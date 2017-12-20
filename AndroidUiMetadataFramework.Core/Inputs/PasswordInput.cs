@@ -9,6 +9,7 @@
 	using AndroidUiMetadataFramework.Core.Managers;
 	using AndroidUiMetadataFramework.Core.Models;
 	using UiMetadataFramework.Basic.Input;
+	using UiMetadataFramework.Core;
 
 	[Input(Type = "password")]
 	public class PasswordInput : IInputManager
@@ -24,6 +25,13 @@
 		    myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("EditText", this.InputText);
             return this.InputText;
 		}
+
+
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+		}
+
 
 		public object GetValue()
 		{

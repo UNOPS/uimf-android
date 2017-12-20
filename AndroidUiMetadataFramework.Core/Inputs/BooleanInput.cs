@@ -7,6 +7,7 @@
 	using AndroidUiMetadataFramework.Core.Attributes;
 	using AndroidUiMetadataFramework.Core.Managers;
 	using AndroidUiMetadataFramework.Core.Models;
+	using UiMetadataFramework.Core;
 
 	[Input(Type = "boolean")]
 	public class BooleanInput : IInputManager
@@ -18,6 +19,11 @@
 			this.InputBoolean = new CheckBox(Application.Context);
             myFormHandler.ManagersCollection.StyleRegister.ApplyStyle("CheckBox", this.InputBoolean);
 			return this.InputBoolean;
+		}
+
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
 		}
 
 		public object GetValue()

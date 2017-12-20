@@ -7,8 +7,9 @@
     using AndroidUiMetadataFramework.Core.Attributes;
     using AndroidUiMetadataFramework.Core.Managers;
     using AndroidUiMetadataFramework.Core.Models;
+	using UiMetadataFramework.Core;
 
-    [Input(Type = "file-uploader")]
+	[Input(Type = "file-uploader")]
     public class FileUploader : IInputManager
     {
         private LinearLayout Layout { get; set; }
@@ -29,7 +30,12 @@
             return this.Layout;
         }
 
-        public object GetValue()
+		public bool IsValid(InputFieldMetadata inputFieldMetadata)
+		{
+			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+		}
+
+		public object GetValue()
         {
             return null;
         }
