@@ -50,7 +50,7 @@
 
 		public bool IsValid(InputFieldMetadata inputFieldMetadata)
 		{
-			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+			return !inputFieldMetadata.Required || ((TypeaheadItem<object>)this.GetValue()).Value != null;
 		}
 
 		public object GetValue()

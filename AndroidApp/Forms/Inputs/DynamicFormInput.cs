@@ -31,7 +31,7 @@
 
 		public bool IsValid(InputFieldMetadata inputFieldMetadata)
 		{
-			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+			return !inputFieldMetadata.Required || !string.IsNullOrEmpty(this.GetValue()?.ToString());
 		}
 
 		public object GetValue()
@@ -45,15 +45,20 @@
             {
                 Inputs = new List<InputItem>()
             };
+            var valid = true;
             foreach (var inputManager in this.InputsManager)
-            {
-                var value = inputManager.Manager.GetValue();
-                if (value == null && inputManager.Input.Required)
+            {               
+                var inputMetadata = new InputFieldMetadata(inputManager.Input.Type)
+                {
+                    Required = inputManager.Input.Required
+                };
+                if (!inputManager.Manager.IsValid(inputMetadata))
                 {
                     this.FormHandler.ManagersCollection.StyleRegister.ApplyStyle("ValidationError", inputManager.InputView);
-                    return null;
+                    valid = false;
+                    continue;
                 }
-                
+                var value = inputManager.Manager.GetValue();
                 inputManager.Input.Value = value?.ToString();
                 if (value is DropdownValue<string> dropdownValue)
                 {
@@ -62,6 +67,7 @@
                    
                 result.Inputs.Add(inputManager.Input);
             }
+            if (!valid) return null;
             return result;
         }
 

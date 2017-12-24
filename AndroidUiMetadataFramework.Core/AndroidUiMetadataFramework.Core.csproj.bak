@@ -16,7 +16,7 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -140,7 +140,7 @@
     <Compile Include="Models\ListViewHolder.cs" />
     <Compile Include="Models\ListCustomAdapter.cs" />
     <Compile Include="Managers\OutputManager.cs" />
-    <Compile Include="Managers\InputManager.cs" />
+    <Compile Include="Managers\IInputManager.cs" />
     <Compile Include="Managers\OutputManagerCollection.cs" />
     <Compile Include="Managers\InputManagerCollection.cs" />
     <Compile Include="Inputs\DateTimeInput.cs" />

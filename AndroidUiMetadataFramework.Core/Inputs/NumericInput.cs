@@ -34,7 +34,7 @@
 
 		public bool IsValid(InputFieldMetadata inputFieldMetadata)
 		{
-			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
+			return !inputFieldMetadata.Required || !string.IsNullOrEmpty(this.GetValue()?.ToString());
 		}
 
 		public void SetValue(object value)

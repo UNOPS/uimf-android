@@ -50,9 +50,11 @@
         }
 
 		public bool IsValid(InputFieldMetadata inputFieldMetadata)
-		{
-			return !inputFieldMetadata.Required || string.IsNullOrEmpty(this.GetValue()?.ToString());
-		}
+        {
+            var value = (MultiSelect<object>)this.GetValue();
+
+            return !inputFieldMetadata.Required || value.Items != null && value.Items.Any();
+        }
 
 		public object GetValue()
         {
