@@ -5,7 +5,6 @@
     using Android.Views;
     using AndroidUiMetadataFramework.Core.Models;
     using Java.Lang;
-    using UiMetadataFramework.Basic.Output;
     using UiMetadataFramework.Basic.Response;
 
     public class CustomFormWrapper : IFormWrapper

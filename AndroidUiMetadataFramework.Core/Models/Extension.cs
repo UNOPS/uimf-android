@@ -53,8 +53,7 @@
         public static T GetCustomProperty<T>(this IDictionary<string, object> customProperties, string property)
         {
             var dictionary = new Dictionary<string, object>(customProperties, StringComparer.OrdinalIgnoreCase);
-            object value;
-            dictionary.TryGetValue(property, out value);
+            dictionary.TryGetValue(property, out var value);
             return value != null ? value.CastTObject<T>() : default(T);
         }
 

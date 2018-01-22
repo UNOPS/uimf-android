@@ -122,8 +122,7 @@
             HttpHeaders responseHeaders)
         {
             var cookies = new List<KeyValuePair<string, string>>();
-            IEnumerable<string> rawCookies;
-            var isCookieHeader = responseHeaders.TryGetValues("Set-Cookie", out rawCookies);
+            var isCookieHeader = responseHeaders.TryGetValues("Set-Cookie", out var rawCookies);
 
             if (isCookieHeader)
             {
