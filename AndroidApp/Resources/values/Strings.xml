@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Hello">Hello World, Click Me!</string>
+    <string name="ApplicationName">AndroidApp</string>
+	<string name="drawer_open">Open menu</string>
+	<string name="drawer_close">Close menu</string>
+	<string name="action_websearch">Web search</string>
+	<string name="app_not_available">Sorry, there\'s no web browser available</string>
+</resources>
